@@ -59,25 +59,25 @@ people = [
 # определяем столбцы
 columns = ("name", "age", "email")
  
-tree = ttk.Treeview(columns=columns, show="headings")
-#tree.grid(row=0, column=0, sticky="nsew")
+alerts = ttk.Treeview(columns=columns, show="headings")
+#alerts.grid(row=0, column=0, sticky="nsew")
  
 # определяем заголовки
-tree.heading("name", text="Имя", anchor=W)
-tree.heading("age", text="Возраст", anchor=W)
-tree.heading("email", text="Email", anchor=W)
+alerts.heading("name", text="Имя", anchor=W)
+alerts.heading("age", text="Возраст", anchor=W)
+alerts.heading("email", text="Email", anchor=W)
  
-tree.column("#1", stretch=NO, width=70)
-tree.column("#2", stretch=NO, width=60)
-tree.column("#3", stretch=NO, width=100)
+alerts.column("#1", stretch=NO, width=70)
+alerts.column("#2", stretch=NO, width=60)
+alerts.column("#3", stretch=NO, width=100)
  
 # добавляем данные
 for person in people:
-    tree.insert("", END, values=person)
+    alerts.insert("", END, values=person)
  
 # добавляем вертикальную прокрутку
-scrollbar = ttk.Scrollbar(orient=VERTICAL, command=tree.yview)
-tree.configure(yscroll=scrollbar.set)
+scrollbar = ttk.Scrollbar(orient=VERTICAL, command=alerts.yview)
+alerts.configure(yscroll=scrollbar.set)
 #scrollbar.grid(row=0, column=1, sticky="ns")
 
 
