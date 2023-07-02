@@ -4,13 +4,16 @@ import sqlite3
 import hashlib
 import test
 import registration
-
-
+import secrets
+from datetime import datetime
+from ttkthemes import *
 
 
 
 
 def login_window():
+    def generate_token():
+        return secrets.token_hex(16)
 
     def login():
         # Подключение к базе данных
@@ -23,11 +26,17 @@ def login_window():
         cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
         result = cursor.fetchone()
         if result:
-            #warning_label.config(text="Верный логин или пароль")
+            login_time = datetime.now()
+            user = cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
+            token = generate_token()
+            cursor.execute("INSERT INTO sessions (user_id, token, login_time) VALUES (?, ?, ?)", (user, token, login_time))
+            conn.commit()
             window.destroy()
             test.main_window()
         else:
             warning_label.config(text="Неверный логин или пароль")
+
+
 
     def register():
         registration.reg_window()
@@ -35,10 +44,12 @@ def login_window():
     def cancel():
         window.destroy()
 
-    window = Tk()
+    window = ThemedTk(theme="equilux")
     window.title("Charlotte 0.01v - Войти")
     icon = PhotoImage(file = "logo2.png")
     window.iconphoto(True, icon)
+
+
     # получаем размеры экрана
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
@@ -50,6 +61,8 @@ def login_window():
     y = (screen_height // 2) - (window_height // 2)
     # задаем расположение окна и его размеры
     window.geometry('{}x{}+{}+{}'.format(window_width, window_height, x, y))
+
+    
     #Вставляем логотип
     logo = PhotoImage(file="logo2.png")
     label = ttk.Label(window, image=logo)
@@ -90,3 +103,5 @@ def login_window():
 
     window.mainloop()
 login_window()
+
+

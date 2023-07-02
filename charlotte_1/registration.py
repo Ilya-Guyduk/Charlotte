@@ -3,21 +3,25 @@ from tkinter import ttk
 import sqlite3
 import hashlib
 #import main_window
-
+import secrets
 
 
         
 
 def reg_window():
+    def generate_token():
+        return secrets.token_hex(16)
+
     def login():
         # подключаемся к базе данных
         conn = sqlite3.connect('Charlotte')
         cursor = conn.cursor()
-        # создаем таблицу, если она еще не существует
-        cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                        (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                         login TEXT NOT NULL,
-                         password TEXT NOT NULL)''')
+
+        # создаем таблицу сессий, если она еще не существует
+        cursor.execute('''CREATE TABLE sessions
+                        (id INTEGER PRIMARY KEY, 
+                        user_id INTEGER, 
+                        token TEXT)''')
 
         login = login_entry.get()
         password = password_entry.get()
@@ -26,6 +30,9 @@ def reg_window():
 
         # добавляем новую запись в таблицу
         cursor.execute("INSERT INTO users (login, password) VALUES (?, ?)", (login, hashed_password))
+
+        token = generate_token()
+        cursor.execute("INSERT INTO sessions (token) VALUES (?)", (token))
         conn.commit()
 
         # закрываем соединение с базой данных
