@@ -47,12 +47,12 @@ notebook.grid(sticky="nsew")
 frame1 = ttk.Frame(notebook)
 frame2 = ttk.Frame(notebook)
  
-frame1.pack(fill=BOTH, expand=True)
-frame2.pack(fill=BOTH, expand=True)
+#frame1.pack(fill=BOTH, expand=True)
+#aframe2.pack(fill=BOTH, expand=True)
  
 # добавляем фреймы в качестве вкладок
-notebook.add(frame1, text="Первая страница")
-notebook.add(frame2, text="Вторая страница")
+notebook.add(frame1, text="Первая")
+notebook.add(frame2, text="Вторая")
 
 
 
