@@ -29,10 +29,10 @@ def main_menu():
 	main_menu.add_cascade(label="Настройки", menu=set_menu)
 	main_menu.add_cascade(label="Внешний вид", menu=screen_menu)
 	 
-	root.config(menu=main_menu)
+	#root.config(menu=main_menu)
 
 
-	root.mainloop()
+	#root.mainloop()
 
 
 
