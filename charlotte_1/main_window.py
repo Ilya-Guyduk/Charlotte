@@ -10,7 +10,7 @@ root.attributes("-fullscreen", True)
 
 
 tree = ttk.Treeview(show="tree")
-tree.grid(row=0, column=0, columnspan=4, rowspan=3)
+tree.grid(row=0, column=0)
  
 # добавляем отделы
 tree.insert("", END, iid=1, text="192.168.10.1")

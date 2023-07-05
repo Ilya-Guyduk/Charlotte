@@ -33,8 +33,8 @@ def login_window():
             conn.commit()
             window.destroy()
             test.main_window()
-        else:
-            warning_label.config(text="Неверный логин или пароль")
+        #else:
+            #warning_label.config(text="Неверный логин или пароль")
 
 
 
@@ -49,13 +49,12 @@ def login_window():
     icon = PhotoImage(file = "logo2.png")
     window.iconphoto(True, icon)
 
-
     # получаем размеры экрана
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
     # задаем размеры окна
-    window_width = 410
-    window_height = 570
+    window_width = 530
+    window_height = 310
     # вычисляем координаты для центрирования окна
     x = (screen_width // 2) - (window_width // 2)
     y = (screen_height // 2) - (window_height // 2)
@@ -66,40 +65,38 @@ def login_window():
     #Вставляем логотип
     logo = PhotoImage(file="logo2.png")
     label = ttk.Label(window, image=logo)
-    label.pack(anchor=N, padx=5)
-    frame = ttk.Frame(window, borderwidth=2, relief=SOLID, padding=8)
-    frame.pack(side=BOTTOM, padx=5, pady=20)
-        
-    login_label = ttk.Label(frame, text="Логин:")
-    login_label.grid(row=0, column=0)
-    
-    login_entry = ttk.Entry(frame)
-    login_entry.grid(row=0, column=1)
-    
-    password_label = ttk.Label(frame, text="Пароль:")
-    password_label.grid(row=1, column=0, padx=5, pady=5)
-    
-    password_entry = ttk.Entry(frame, show="*")
-    password_entry.grid(row=1, column=1, padx=5, pady=5)
+    label.grid(row=0, column=0, rowspan=7)        
 
-    warning_label = ttk.Label(frame, text="")
-    warning_label.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+    login_label = ttk.Label(text="Логин:")
+    login_label.grid(row=0, column=1)
+    
+    login_entry = ttk.Entry()
+    login_entry.grid(row=1, column=1, columnspan=3)
+    
+    password_label = ttk.Label(text="Пароль:")
+    password_label.grid(row=2, column=1, padx=5, pady=5)
+    
+    password_entry = ttk.Entry(show="*")
+    password_entry.grid(row=3, column=1, columnspan=3, padx=5, pady=5)
+
+    #warning_label = ttk.Label(text="")
+    #warning_label.grid(row=4, column=1, columnspan=3, padx=5, pady=5)
 
     enabled_on = "Пользователь сохранен!"
     enabled_off = "Сохранить пользователя"
     enabled = StringVar(value=enabled_off)
 
-    checkbutton = ttk.Checkbutton(frame, textvariable=enabled, variable=enabled,  offvalue=enabled_off, onvalue=enabled_on)
-    checkbutton.grid(row=2, column=0, columnspan=2, padx=6, pady=6)
+    checkbutton = ttk.Checkbutton(textvariable=enabled, variable=enabled,  offvalue=enabled_off, onvalue=enabled_on)
+    checkbutton.grid(row=4, column=1, columnspan=3, padx=6, pady=6)
         
-    login_button = ttk.Button(frame, text="Принять", command=login)
-    login_button.grid(row=4, column=0, padx=5, pady=5, sticky=W)
+    login_button = ttk.Button(text="Принять", command=login)
+    login_button.grid(row=5, column=1, padx=5, pady=5, sticky=W)
         
-    cancel_button = ttk.Button(frame, text="Отмена", command=cancel)
-    cancel_button.grid(row=4, column=1, padx=5, pady=5, sticky=E)
+    cancel_button = ttk.Button(text="Отмена", command=cancel)
+    cancel_button.grid(row=5, column=2, padx=5, pady=5, sticky=E)
         
-    register_label = ttk.Button(frame, text="Зарегистрироваться", command=register)
-    register_label.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
+    register_label = ttk.Button(text="Зарегистрироваться", command=register)
+    register_label.grid(row=6, column=1, columnspan=2, padx=5, pady=5)
 
     window.mainloop()
 login_window()

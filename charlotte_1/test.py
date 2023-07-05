@@ -6,6 +6,7 @@ from ttkthemes import *
 
 def main_window():
 	root = ThemedTk(theme="equilux")
+	root.title("Charlotte 0.01v")
 	#root.attributes("-fullscreen", True)
 	# set window size to full screen
 	w, h = root.winfo_screenwidth(), root.winfo_screenheight()
@@ -30,32 +31,53 @@ def main_window():
 	tree.insert("", END, iid=8, text="192.168.10.1")
 	 
 	#подменю
+	submenu = ["Мониторинг", "Настройки", "Пользователи" ]
+
+	# добавляем данные
+	for person in submenu:
+	    tree.insert("", index=END, text=person)
+
 
 	tree.insert(1, index=END, text="Мониторинг")
 	tree.insert(1, index=END, text="Ностройки")
 	tree.insert(1, index=END, text="Пользователь")
 
-	tree.insert(2, index=END, text="Bob")
-	tree.insert(2, index=END, text="Sam")
+	
+
+
+
+
+
 
 	notebook_frame = ttk.Frame(root, width=w*0.75, height=h*0.8, borderwidth=2, relief=SOLID, padding=8)
 	notebook_frame.columnconfigure(0, weight=1)
 	notebook_frame.rowconfigure(0, weight=1)
 	notebook = ttk.Notebook(notebook_frame)
 	notebook.grid(sticky="nsew")
-	#notebook.pack()
 
 
 	# создаем пару фреймвов
 	frame1 = ttk.Frame(notebook)
 	frame2 = ttk.Frame(notebook)
+	frame3 = ttk.Frame(notebook)
+	frame4 = ttk.Frame(notebook)
+	frame5 = ttk.Frame(notebook)
+	frame6 = ttk.Frame(notebook)
 	 
 	frame1.pack(fill=BOTH, expand=True)
 	frame2.pack(fill=BOTH, expand=True)
+	frame3.pack(fill=BOTH, expand=True)
+	frame4.pack(fill=BOTH, expand=True)
+	frame5.pack(fill=BOTH, expand=True)
+	frame6.pack(fill=BOTH, expand=True)
 	 
 	# добавляем фреймы в качестве вкладок
-	notebook.add(frame1, text="Первая страница")
-	notebook.add(frame2, text="Вторая страница")
+	notebook.add(frame1, text="Терминал")
+	notebook.add(frame2, text="Файловый менеджер")
+	notebook.add(frame3, text="Процессы")
+	notebook.add(frame4, text="Память")
+	notebook.add(frame5, text="Нагрузка")
+	notebook.add(frame6, text="RAID")
 
 
 
@@ -86,9 +108,9 @@ def main_window():
 	alerts.heading("Data", text="Data", anchor=W)
 	alerts.heading("Trigger", text="Trigger", anchor=W)
 	 
-	alerts.column("#1", stretch=NO, width=70)
-	alerts.column("#2", stretch=NO, width=60)
-	alerts.column("#3", stretch=NO, width=100)
+	alerts.column("#1", stretch=NO)
+	alerts.column("#2", stretch=NO)
+	alerts.column("#3", stretch=NO)
 	 
 	# добавляем данные
 	for person in people:
@@ -100,11 +122,6 @@ def main_window():
 	scrollbar.grid(sticky="nse")
 
 
-	text_entry = ttk.Frame(root, width=w*0.75, height=h*0.2, borderwidth=1, relief=SOLID, padding=2)
-	text_entry.columnconfigure(0, weight=1)
-	text_entry.rowconfigure(0, weight=1)
-	word_editor = Text(text_entry, wrap="word")
-	word_editor.grid(sticky="nsew")
 
 	# configure grid
 	root.rowconfigure(0, weight=1)
@@ -114,9 +131,9 @@ def main_window():
 
 	# place widgets in window
 	tree_frame.grid(row=0, column=0, sticky='nsew')
-	notebook_frame.grid(row=0, column=1, sticky='nsew')
+	notebook_frame.grid(row=0, column=1, rowspan=2, sticky='nsew')
 	listbox.grid(row=1, column=0, sticky='nsew')
-	text_entry.grid(row=1, column=1, sticky='nsew')
+	
 
 	root.mainloop()
 
