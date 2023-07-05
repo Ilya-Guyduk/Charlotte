@@ -11,39 +11,38 @@ from ttkthemes import *
 
 
 
-def login_window():
-    def generate_token():
-        return secrets.token_hex(16)
 
-    def login():
-        # Подключение к базе данных
-        conn = sqlite3.connect('charlotte')
-        # Создание курсора для выполнения запросов
-        cursor = conn.cursor()
-        login = login_entry.get()
-        password = password_entry.get()
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
-        result = cursor.fetchone()
-        if result:
-            login_time = datetime.now()
-            user = cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
-            token = generate_token()
-            cursor.execute("INSERT INTO sessions (user_id, token, login_time) VALUES (?, ?, ?)", (user, token, login_time))
-            conn.commit()
-            window.destroy()
-            test.main_window()
-        #else:
-            #warning_label.config(text="Неверный логин или пароль")
+def generate_token():
+    return secrets.token_hex(16)
 
-
-
-    def register():
-        registration.reg_window()
-
-    def cancel():
+def login():
+    # Подключение к базе данных
+    conn = sqlite3.connect('charlotte')
+    # Создание курсора для выполнения запросов
+    cursor = conn.cursor()
+    login = login_entry.get()
+    password = password_entry.get()
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
+    result = cursor.fetchone()
+    if result:
+        login_time = datetime.now()
+        user = cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
+        token = generate_token()
+        cursor.execute("INSERT INTO sessions (user_id, token, login_time) VALUES (?, ?, ?)", (user, token, login_time))
+        conn.commit()
         window.destroy()
+        test.main_window()
+    #else:
+        #warning_label.config(text="Неверный логин или пароль")
 
+def register():
+    registration.reg_window()
+
+def cancel():
+    window.destroy()
+
+def login_window():
     window = ThemedTk(theme="equilux")
     window.title("Charlotte 0.01v - Войти")
     icon = PhotoImage(file = "logo2.png")
@@ -99,6 +98,7 @@ def login_window():
     register_label.grid(row=6, column=1, columnspan=2, padx=5, pady=5)
 
     window.mainloop()
+
 login_window()
 
 
