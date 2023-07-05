@@ -52,18 +52,18 @@ def login_window():
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
     # задаем размеры окна
-    window_width = 530
-    window_height = 310
+    window_width = 380
+    window_height = 230
     # вычисляем координаты для центрирования окна
     x = (screen_width // 2) - (window_width // 2)
     y = (screen_height // 2) - (window_height // 2)
     # задаем расположение окна и его размеры
     window.geometry('{}x{}+{}+{}'.format(window_width, window_height, x, y))
 
-    
     #Вставляем логотип
     logo = PhotoImage(file="logo2.png")
-    label = ttk.Label(window, image=logo)
+    logo = logo.subsample(2, 2)  # уменьшение в 2 раза по x и y
+    label = ttk.Label(image=logo)
     label.grid(row=0, column=0, rowspan=7)        
 
     login_label = ttk.Label(text="Логин:")
@@ -98,6 +98,11 @@ def login_window():
     register_label.grid(row=6, column=1, columnspan=2, padx=5, pady=5)
 
     window.mainloop()
+
+
+
+
+
 
 login_window()
 
