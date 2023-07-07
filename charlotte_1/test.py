@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from ttkthemes import *
+import ttkthemes
 import treeview
 import notebook
 import alerts
@@ -8,7 +8,8 @@ import alerts
 
 
 def main_window():
-	root = ThemedTk(theme="equilux")
+	root = Tk()
+	root.style = ttkthemes.ThemedStyle(theme="equilux")
 	root.title("Charlotte 0.01v")
 	#root.attributes("-fullscreen", True)
 	# set window size to full screen

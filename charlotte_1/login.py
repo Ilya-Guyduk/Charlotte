@@ -44,9 +44,9 @@ def cancel():
 #функция основного окна
 def login_window():
     window = Tk()
-    window.style = ttkthemes.ThemedStyle()
+    #window.style = ttkthemes.ThemedStyle(theme="equilux")
     window.title("Charlotte 0.01v - Войти")
-    icon = PhotoImage(file = "./img/logo2.png")
+    icon = PhotoImage(file = "logo2.png")
     window.iconphoto(True, icon)
 
     # получаем размеры экрана
@@ -63,7 +63,7 @@ def login_window():
 
     #Вставляем логотип
     logo = PhotoImage(file="logo2.png")
-    logo = logo.subsample(1.9, 1.9)  #уменьшение в 2 раза по x и y
+    logo = logo.subsample(2, 2)  #уменьшение в 2 раза по x и y
     label = ttk.Label(image=logo)
     label.grid(row=0, column=0, rowspan=7)        
 
