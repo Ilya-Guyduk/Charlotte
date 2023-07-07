@@ -46,7 +46,7 @@ def login_window():
     window = Tk()
     window.style = ttkthemes.ThemedStyle()
     window.title("Charlotte 0.01v - Войти")
-    icon = PhotoImage(file = "logo2.png")
+    icon = PhotoImage(file = "./img/logo2.png")
     window.iconphoto(True, icon)
 
     # получаем размеры экрана
