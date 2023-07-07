@@ -6,12 +6,11 @@ import test
 import registration
 import secrets
 from datetime import datetime
-from ttkthemes import *
+import ttkthemes 
 
 
 
-
-
+#функция генерации токена для сесии 
 def generate_token():
     return secrets.token_hex(16)
 
@@ -33,17 +32,19 @@ def login():
         conn.commit()
         window.destroy()
         test.main_window()
-    #else:
-        #warning_label.config(text="Неверный логин или пароль")
 
+#функция открытия окна регистрации
 def register():
     registration.reg_window()
 
+#функция закрытия окна по нажатию на кнопку "cancel"
 def cancel():
     window.destroy()
 
+#функция основного окна
 def login_window():
-    window = ThemedTk(theme="equilux")
+    window = Tk()
+    window.style = ttkthemes.ThemedStyle()
     window.title("Charlotte 0.01v - Войти")
     icon = PhotoImage(file = "logo2.png")
     window.iconphoto(True, icon)
@@ -52,7 +53,7 @@ def login_window():
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
     # задаем размеры окна
-    window_width = 380
+    window_width = 400
     window_height = 230
     # вычисляем координаты для центрирования окна
     x = (screen_width // 2) - (window_width // 2)
@@ -62,7 +63,7 @@ def login_window():
 
     #Вставляем логотип
     logo = PhotoImage(file="logo2.png")
-    logo = logo.subsample(2, 2)  # уменьшение в 2 раза по x и y
+    logo = logo.subsample(1.9, 1.9)  #уменьшение в 2 раза по x и y
     label = ttk.Label(image=logo)
     label.grid(row=0, column=0, rowspan=7)        
 
@@ -73,10 +74,10 @@ def login_window():
     login_entry.grid(row=1, column=1, columnspan=3)
     
     password_label = ttk.Label(text="Пароль:")
-    password_label.grid(row=2, column=1, padx=5, pady=5)
+    password_label.grid(row=2, column=1)
     
     password_entry = ttk.Entry(show="*")
-    password_entry.grid(row=3, column=1, columnspan=3, padx=5, pady=5)
+    password_entry.grid(row=3, column=1, columnspan=3)
 
     #warning_label = ttk.Label(text="")
     #warning_label.grid(row=4, column=1, columnspan=3, padx=5, pady=5)
@@ -98,9 +99,6 @@ def login_window():
     register_label.grid(row=6, column=1, columnspan=2, padx=5, pady=5)
 
     window.mainloop()
-
-
-
 
 
 

@@ -8,42 +8,42 @@ import secrets
 
         
 
-def reg_window():
-    def generate_token():
-        return secrets.token_hex(16)
 
-    def login():
-        # подключаемся к базе данных
-        conn = sqlite3.connect('Charlotte')
-        cursor = conn.cursor()
+def generate_token():
+    return secrets.token_hex(16)
 
-        # создаем таблицу сессий, если она еще не существует
-        cursor.execute('''CREATE TABLE sessions
-                        (id INTEGER PRIMARY KEY, 
-                        user_id INTEGER, 
-                        token TEXT)''')
+def login():
+    # подключаемся к базе данных
+    conn = sqlite3.connect('Charlotte')
+    cursor = conn.cursor()
 
-        login = login_entry.get()
-        password = password_entry.get()
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    # создаем таблицу сессий, если она еще не существует
+    cursor.execute('''CREATE TABLE sessions
+                    (id INTEGER PRIMARY KEY, 
+                    user_id INTEGER, 
+                    token TEXT)''')
+
+    login = login_entry.get()
+    password = password_entry.get()
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
 
         # добавляем новую запись в таблицу
-        cursor.execute("INSERT INTO users (login, password) VALUES (?, ?)", (login, hashed_password))
+    cursor.execute("INSERT INTO users (login, password) VALUES (?, ?)", (login, hashed_password))
 
-        token = generate_token()
-        cursor.execute("INSERT INTO sessions (token) VALUES (?)", (token))
-        conn.commit()
+    token = generate_token()
+    cursor.execute("INSERT INTO sessions (token) VALUES (?)", (token))
+    conn.commit()
 
-        # закрываем соединение с базой данных
-        conn.close()
-        register_window.destroy()
-
-
-    def cancel():
-        register_window.destroy()
+    # закрываем соединение с базой данных
+    conn.close()
+    register_window.destroy()
 
 
+def cancel():
+    register_window.destroy()
+
+def reg_window():
     register_window = Toplevel()
     register_window.title("Charlotte 0.01v")
     icon = PhotoImage(file = "logo2.png")

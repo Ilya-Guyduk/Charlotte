@@ -30,4 +30,7 @@ def save_check():
 	print("save_user: ", save_user)
 	print("save_pass: ", save_pass)
 
-	login.login_window()
+	
+
+
+save_check()
