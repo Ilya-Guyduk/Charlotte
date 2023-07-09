@@ -18,7 +18,7 @@ def alerts(parent):
 	columns = ("Host", "Data", "Trigger")
 	 
 	alerts = ttk.Treeview(parent, columns=columns, show="headings")
-	alerts.grid(sticky="nsew")
+	alerts.grid(row=7, column=0, rowspan=3, columnspan=2, sticky="nsw")
 	 
 	# определяем заголовки
 	alerts.heading("Host", text="Host", anchor=W)

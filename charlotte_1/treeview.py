@@ -17,7 +17,7 @@ def treeview(parent):
 
 
 	tree = ttk.Treeview(parent, show="tree")
-	tree.grid(sticky="nsew")
+	tree.grid(row=0, column=0, rowspan=7, columnspan=2, sticky="nsew")
 
 	# Полученные данные из таблицы servers
 	for i, row in enumerate(rows):
