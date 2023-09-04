@@ -10,7 +10,7 @@ from datetime import datetime
 import ttkthemes 
 import sv_ttk
 import db #модуль с подключением к бд
-
+import customtkinter as ctk
 
 #функция генерации токена для сесии 
 def generate_token():
@@ -23,9 +23,9 @@ def login():
     cursor = conn.cursor()
     login = login_entry.get()
     password = password_entry.get()
-    global state
     #state = 0
     if enabled == "Пользователь сохранен!":
+        global state
         state = enabled.get()
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
@@ -53,7 +53,7 @@ def cancel():
 #функция основного окна
 def login_window():
     global window
-    window = Tk()
+    window = ctk.CTk()
     #window.style = ttkthemes.ThemedStyle(theme="equilux")
     window.title("Charlotte 0.01v - Войти")
     icon = PhotoImage(file = "logo2.png")
@@ -78,24 +78,24 @@ def login_window():
     #Вставляем логотип
     logo = PhotoImage(file="logo2.png")
     logo = logo.subsample(2, 2)  #уменьшение в 2 раза по x и y
-    label = ttk.Label(image=logo)
+    label = ctk.CTkLabel(window, image=logo)
     label.grid(row=0, column=0, rowspan=7)        
 
-    login_label = ttk.Label(text="Логин:")
+    login_label = ctk.CTkLabel(window, text="Логин:")
     login_label.grid(row=0, column=1, sticky=W, pady=5, padx=5)
     
     global login_entry
-    login_entry = ttk.Entry()
+    login_entry = ctk.CTkEntry(window)
     login_entry.grid(row=1, column=1, columnspan=3, sticky="nsew", padx=5)
     
-    password_label = ttk.Label(text="Пароль:") #
+    password_label = ctk.CTkLabel(window, text="Пароль:") #
     password_label.grid(row=2, column=1, sticky=W, pady=5, padx=5)
     
     global password_entry
-    password_entry = ttk.Entry(show="*")
+    password_entry = ctk.CTkEntry(window, show="*")
     password_entry.grid(row=3, column=1, columnspan=3, sticky="nsew", padx=5)
 
-    #warning_label = ttk.Label(text="")
+    #warning_label = ttk.Label(window, text="")
     #warning_label.grid(row=4, column=1, columnspan=3, padx=5, pady=5)
 
     enabled_on = "Пользователь сохранен!"
@@ -103,16 +103,16 @@ def login_window():
     global enabled
     enabled = StringVar(value=enabled_off)
 
-    checkbutton = ttk.Checkbutton(textvariable=enabled, variable=enabled,  offvalue=enabled_off, onvalue=enabled_on)
+    checkbutton = ctk.CTkCheckBox(window, textvariable=enabled, variable=enabled,  offvalue=enabled_off, onvalue=enabled_on)
     checkbutton.grid(row=4, column=1, columnspan=3, pady=5, padx=5)
         
-    login_button = ttk.Button(text="Принять", command=login)
+    login_button = ctk.CTkButton(window, text="Принять", command=login)
     login_button.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
         
-    cancel_button = ttk.Button(text="Отмена", command=cancel)
+    cancel_button = ctk.CTkButton(window, text="Отмена", command=cancel)
     cancel_button.grid(row=5, column=2, padx=5, pady=5, sticky="nsew")
         
-    register_label = ttk.Button(text="Зарегистрироваться", command=register)
+    register_label = ctk.CTkButton(window, text="Зарегистрироваться", command=register)
     register_label.grid(row=6, column=1, columnspan=2, pady=5, sticky="nsew")
 
     sv_ttk.set_theme("dark")
