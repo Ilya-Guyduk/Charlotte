@@ -7,10 +7,9 @@ import test
 import registration #модуль с окном регистрации
 import secrets
 from datetime import datetime
-import ttkthemes 
-import sv_ttk
 import db #модуль с подключением к бд
 import customtkinter as ctk
+from PIL import Image
 
 #функция генерации токена для сесии 
 def generate_token():
@@ -23,10 +22,9 @@ def login():
     cursor = conn.cursor()
     login = login_entry.get()
     password = password_entry.get()
-    #state = 0
-    if enabled == "Пользователь сохранен!":
-        global state
-        state = enabled.get()
+    global state 
+    state = 0
+    
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
     result = cursor.fetchone()
@@ -34,11 +32,14 @@ def login():
         login_time = datetime.now()
         user = cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
         token = generate_token()
+
+        if enabled == "Пользователь сохранен!":
+            state = 1
         cursor.execute("INSERT INTO sessions (user_id, token, login_time, save_user) VALUES (?, ?, ?, ?)", (user, token, login_time, state))
         conn.commit()
         # закрываем соединение с базой данных
         conn.close()
-        test.main_window()
+        test.App()
         window.destroy()
         
 
@@ -76,8 +77,8 @@ def login_window():
     window.resizable(False, False)
 
     #Вставляем логотип
-    logo = PhotoImage(file="logo2.png")
-    logo = logo.subsample(2, 2)  #уменьшение в 2 раза по x и y
+    logo = ctk.CTkImage(Image.open("logo2.png"), size=(180, 180))
+    #logo = logo.subsample(2, 2)  #уменьшение в 2 раза по x и y
     label = ctk.CTkLabel(window, image=logo)
     label.grid(row=0, column=0, rowspan=7)        
 
@@ -115,7 +116,6 @@ def login_window():
     register_label = ctk.CTkButton(window, text="Зарегистрироваться", command=register)
     register_label.grid(row=6, column=1, columnspan=2, pady=5, sticky="nsew")
 
-    sv_ttk.set_theme("dark")
 
     window.grid_rowconfigure(0, weight=1)
     window.grid_rowconfigure(1, weight=1)
