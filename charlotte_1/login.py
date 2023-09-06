@@ -10,122 +10,104 @@ from datetime import datetime
 import db #модуль с подключением к бд
 import customtkinter as ctk
 from PIL import Image
+import os
 
-#функция генерации токена для сесии 
-def generate_token():
-    return secrets.token_hex(16)
+class loginwindow(ctk.CTk):
+    #функция основного окна
+    def __init__(self):
+        self.window = ctk.CTk()
+        self.window.title("Charlotte 0.01v - Войти")
+        #self.icon = PhotoImage(file = "logo2.png")
+        #self.window.iconphoto(True, self.icon)
+        #self.geometry(f"{1100}x{580}") 
+        self.window.resizable(False, False)
 
-def login():
-    # Подключение к базе данных
-    conn = sqlite3.connect('charlotte')
-    # Создание курсора для выполнения запросов
-    cursor = conn.cursor()
-    login = login_entry.get()
-    password = password_entry.get()
-    global state 
-    state = 0
-    
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
-    result = cursor.fetchone()
-    if result:
-        login_time = datetime.now()
-        user = cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
-        token = generate_token()
+        #Вставляем логотип
+        #self.logo = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")))
+        #self.label = ctk.CTkLabel(self.window, image=self.logo)
+        #self.logo.grid(row=0, column=0, rowspan=7)        
 
-        if enabled == "Пользователь сохранен!":
-            state = 1
-        cursor.execute("INSERT INTO sessions (user_id, token, login_time, save_user) VALUES (?, ?, ?, ?)", (user, token, login_time, state))
-        conn.commit()
-        # закрываем соединение с базой данных
-        conn.close()
-        test.App()
+        self.login_label = ctk.CTkLabel(self.window, text="Логин:")
+        self.login_label.grid(row=0, column=1, sticky=W, pady=5, padx=5)
+        
+        
+        self.login_entry = ctk.CTkEntry(self.window)
+        self.login_entry.grid(row=1, column=1, columnspan=3, sticky="nsew", padx=5)
+        
+        self.password_label = ctk.CTkLabel(self.window, text="Пароль:") #
+        self.password_label.grid(row=2, column=1, sticky=W, pady=5, padx=5)
+        
+        
+        self.password_entry = ctk.CTkEntry(self.window, show="*")
+        self.password_entry.grid(row=3, column=1, columnspan=3, sticky="nsew", padx=5)
+
+        self.enabled_on = "Пользователь сохранен!"
+        self.enabled_off = "Сохранить пользователя"
+        self.enabled = StringVar(value=self.enabled_off)
+
+        self.checkbutton = ctk.CTkCheckBox(self.window, textvariable=self.enabled, variable=self.enabled,  offvalue=self.enabled_off, onvalue=self.enabled_on)
+        self.checkbutton.grid(row=4, column=1, columnspan=3, pady=5, padx=5)
+            
+        self.login_button = ctk.CTkButton(self.window, text="Принять", command=self.login)
+        self.login_button.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
+            
+        self.cancel_button = ctk.CTkButton(self.window, text="Отмена", command=self.cancel)
+        self.cancel_button.grid(row=5, column=2, padx=5, pady=5, sticky="nsew")
+            
+        self.register_label = ctk.CTkButton(self.window, text="Зарегистрироваться", command=self.register)
+        self.register_label.grid(row=6, column=1, columnspan=2, pady=5, sticky="nsew")
+
+
+        self.window.grid_rowconfigure(0, weight=1)
+        self.window.grid_rowconfigure(1, weight=1)
+        self.window.grid_rowconfigure(2, weight=1)
+        self.window.grid_columnconfigure(0, weight=1)
+
+        #self.window.mainloop()
+
+    #функция генерации токена для сесии 
+    def generate_token(self):
+        return secrets.token_hex(16)
+
+    def login(self):
+        # Подключение к базе данных
+        conn = sqlite3.connect('charlotte')
+        # Создание курсора для выполнения запросов
+        cursor = conn.cursor()
+        login = self.login_entry.get()
+        password = self.password_entry.get()
+        global state 
+        state = 0
+        
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
+        result = cursor.fetchone()
+        if result:
+            login_time = datetime.now()
+            user = cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
+            token = self.generate_token()
+
+            if self.enabled == "Пользователь сохранен!":
+                state = 1
+            cursor.execute("INSERT INTO sessions (user_id, token, login_time, save_user) VALUES (?, ?, ?, ?)", (user, token, login_time, state))
+            conn.commit()
+            # закрываем соединение с базой данных
+            conn.close()
+            test.App()
+            self.window.destroy()
+            
+
+    #функция открытия окна регистрации
+    def register(self):
+        registration.reg_window()
+
+    #функция закрытия окна по нажатию на кнопку "cancel"
+    def cancel(self):
         window.destroy()
-        
-
-#функция открытия окна регистрации
-def register():
-    registration.reg_window()
-
-#функция закрытия окна по нажатию на кнопку "cancel"
-def cancel():
-    window.destroy()
-
-#функция основного окна
-def login_window():
-    global window
-    window = ctk.CTk()
-    #window.style = ttkthemes.ThemedStyle(theme="equilux")
-    window.title("Charlotte 0.01v - Войти")
-    icon = PhotoImage(file = "logo2.png")
-    window.iconphoto(True, icon)
-
-    #custom_font = font.Font(family="Cousine")
-
-    # получаем размеры экрана
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-    # задаем размеры окна
-    window_width = 400
-    window_height = 230
-    # вычисляем координаты для центрирования окна
-    x = (screen_width // 2) - (window_width // 2)
-    y = (screen_height // 2) - (window_height // 2)
-    # задаем расположение окна и его размеры
-    window.geometry('{}x{}+{}+{}'.format(window_width, window_height, x, y))
-    #запрещаем изменение размера окна 
-    window.resizable(False, False)
-
-    #Вставляем логотип
-    logo = ctk.CTkImage(Image.open("logo2.png"), size=(180, 180))
-    #logo = logo.subsample(2, 2)  #уменьшение в 2 раза по x и y
-    label = ctk.CTkLabel(window, image=logo)
-    label.grid(row=0, column=0, rowspan=7)        
-
-    login_label = ctk.CTkLabel(window, text="Логин:")
-    login_label.grid(row=0, column=1, sticky=W, pady=5, padx=5)
-    
-    global login_entry
-    login_entry = ctk.CTkEntry(window)
-    login_entry.grid(row=1, column=1, columnspan=3, sticky="nsew", padx=5)
-    
-    password_label = ctk.CTkLabel(window, text="Пароль:") #
-    password_label.grid(row=2, column=1, sticky=W, pady=5, padx=5)
-    
-    global password_entry
-    password_entry = ctk.CTkEntry(window, show="*")
-    password_entry.grid(row=3, column=1, columnspan=3, sticky="nsew", padx=5)
-
-    #warning_label = ttk.Label(window, text="")
-    #warning_label.grid(row=4, column=1, columnspan=3, padx=5, pady=5)
-
-    enabled_on = "Пользователь сохранен!"
-    enabled_off = "Сохранить пользователя"
-    global enabled
-    enabled = StringVar(value=enabled_off)
-
-    checkbutton = ctk.CTkCheckBox(window, textvariable=enabled, variable=enabled,  offvalue=enabled_off, onvalue=enabled_on)
-    checkbutton.grid(row=4, column=1, columnspan=3, pady=5, padx=5)
-        
-    login_button = ctk.CTkButton(window, text="Принять", command=login)
-    login_button.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
-        
-    cancel_button = ctk.CTkButton(window, text="Отмена", command=cancel)
-    cancel_button.grid(row=5, column=2, padx=5, pady=5, sticky="nsew")
-        
-    register_label = ctk.CTkButton(window, text="Зарегистрироваться", command=register)
-    register_label.grid(row=6, column=1, columnspan=2, pady=5, sticky="nsew")
-
-
-    window.grid_rowconfigure(0, weight=1)
-    window.grid_rowconfigure(1, weight=1)
-    window.grid_rowconfigure(2, weight=1)
-    window.grid_columnconfigure(0, weight=1)
-
-    window.mainloop()
 
 
 
-login_window()
+
+
 
 

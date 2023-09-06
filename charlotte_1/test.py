@@ -1,6 +1,10 @@
 import tkinter
 import tkinter.messagebox
 import customtkinter
+import scrollableLabelButtonFrame as sc
+#import login
+import os
+from PIL import Image
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -14,7 +18,6 @@ class App(customtkinter.CTk):
         self.title("Charlotte v0.01")
         self.geometry(f"{1100}x{580}")
         
-
         # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=0)
@@ -25,9 +28,36 @@ class App(customtkinter.CTk):
         self.sidebar_frame.grid(row=0, column=0, rowspan=4, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
 
+
+
+
+
+        self.frame_1 = customtkinter.CTkFrame(master=self)
+        self.frame_1.grid(row=0, column=0, columnspan=4, pady=10, padx=0)
+
+        self.optionmenu_1 = customtkinter.CTkOptionMenu(self.frame_1, values=["Option 1", "Option 2", "Option 42 long long long..."])
+        self.optionmenu_1.grid(row=0, column=0, pady=10, padx=10)
+        self.optionmenu_1.set("CTk Option Menu")
+
+        self.combobox_1 = customtkinter.CTkComboBox(self.frame_1, values=["Option 1", "Option 2", "Option 42 long long long..."])
+        self.combobox_1.grid(row=0, column=1, pady=10, padx=0)
+        self.combobox_1.set("CTk Combo Box")
+
+        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.frame_1, values=["Light", "Dark", "System"])
+        self.appearance_mode_optionemenu.grid(row=0, column=2, padx=0, pady=10)
+
+        self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.frame_1, values=["80%", "90%", "100%", "110%", "120%"])
+        self.scaling_optionemenu.grid(row=0, column=3, padx=0, pady=10)
+
+        
+
+
+
+
+
         #лого на главном экране
         self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Charlotte", font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.logo_label.grid(row=0, column=0, padx=5, pady=3, columnspan=2)
+        self.logo_label.grid(row=0, column=0, padx=5, pady=3, columnspan=2, sticky="w")
         
 
         #self.button_frame = customtkinter.CTkFrame(self.sidebar_frame)
@@ -41,19 +71,17 @@ class App(customtkinter.CTk):
         #self.sidebar_button_3 = customtkinter.CTkButton(self.button_frame, width=30, text="G", command=self.sidebar_button_event)
         #self.sidebar_button_3.grid(row=1, column=2, padx=3, pady=3)
         
-        #Окно с подключениями
-        self.scrollable_frame = customtkinter.CTkScrollableFrame(self.sidebar_frame)
-        self.scrollable_frame.grid(row=4, column=0, padx=5, pady=3, columnspan=2, sticky="nsew")
-        self.scrollable_frame_switches = []
-        for i in range(100):
-            switch = customtkinter.CTkSwitch(master=self.scrollable_frame, text=f"Сервер {i}")
-            switch.grid(row=i, column=0, padx=10, pady=(0, 20), columnspan=2)
-            self.scrollable_frame_switches.append(switch)
+        #Меню с подключениями
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.scrollable_label_button_frame = sc.ScrollableLabelButtonFrame(master=self.sidebar_frame, width=300, command=self.label_button_frame_event, corner_radius=0)
+        self.scrollable_label_button_frame.grid(row=4, column=0, padx=5, pady=3, columnspan=2, sticky="nsew")
+        for i in range(40):  # add items with images
+            self.scrollable_label_button_frame.add_item(f"Сервер {i}", image=customtkinter.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png"))))
+
 
         self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Оформление:", anchor="w", width=50)
         self.appearance_mode_label.grid(row=5, column=0, padx=5, pady=3)
-        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
-                                                                       command=self.change_appearance_mode_event)
+        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"], command=self.change_appearance_mode_event)
         self.appearance_mode_optionemenu.grid(row=6, column=0, padx=5, pady=3)
 
         self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="Масштаб:", anchor="w", width=50)
@@ -182,7 +210,12 @@ class App(customtkinter.CTk):
     def sidebar_button_event(self):
         print("sidebar_button click")
 
+    def label_button_frame_event(self, item):
+        print(f"label button frame clicked: {item}")
+
+
 
 if __name__ == "__main__":
     app = App()
+    #login.loginwindow()
     app.mainloop()
