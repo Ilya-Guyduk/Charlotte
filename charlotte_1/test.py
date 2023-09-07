@@ -52,8 +52,8 @@ class App(ctk.CTk):
         self.logo_label = ctk.CTkLabel(self.sidebar_frame,
                                        text=" Charlotte",
                                        font=ctk.CTkFont(size=18, weight="bold"),
-                                       image=ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png"))),
-                                       compound="left")
+                                       #image=ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png"))),compound="left"
+                                       )
         self.logo_label.grid(row=0,
                              column=0,
                              padx=5,
@@ -69,39 +69,25 @@ class App(ctk.CTk):
                                padx=3,
                                pady=3,
                                sticky="nsew")
-        self.sidebar_button_1 = ctk.CTkButton(self.button_frame,
-                                                        width=30,
-                                                        text="+",
-                                                        command=self.open_input_dialog_event,
-                                                        border_width=1,
-                                                        corner_radius=3,
-                                                        border_spacing=0,
-                                                        hover_color=("#FF8C00"),
-                                                        fg_color=("#696969"))
+        self.sidebar_button_1 = button.LittleAcessButton(self.button_frame,
+                                                         text="+",
+                                                         command=self.open_input_dialog_event)
         self.sidebar_button_1.grid(row=1,
                                    column=0)
-        self.sidebar_button_2 = ctk.CTkButton(self.button_frame, 
-                                                        width=30,
-                                                        text="+c",
-                                                        command=self.open_input_dialog_event,
-                                                        border_width=1,
-                                                        corner_radius=3,
-                                                        border_spacing=0,
-                                                        hover_color=("#FF8C00"),
-                                                        fg_color=("#696969"))
+        self.sidebar_button_2 = button.LittleAcessButton(self.button_frame,
+                                                         text="+c",
+                                                         command=self.open_input_dialog_event)
         self.sidebar_button_2.grid(row=1,
                                    column=1)
-        self.sidebar_button_3 = ctk.CTkButton(self.button_frame, 
-                                                        width=30,
-                                                        text="G",
-                                                        command=self.sidebar_button_event,
-                                                        border_width=1,
-                                                        corner_radius=3,
-                                                        border_spacing=0,
-                                                        hover_color=("#FF8C00"),
-                                                        fg_color=("#696969"))
+        self.sidebar_button_3 = button.LittleAcessButton(self.button_frame,
+                                                         text="g",
+                                                         command=self.open_input_dialog_event)
         self.sidebar_button_3.grid(row=1,
                                    column=2)
+        self.sidebar_button_3 = button.LittleOwnButton(self.button_frame,
+                                                         text="?")
+        self.sidebar_button_3.grid(row=1,
+                                   column=3)
         
         #Меню с подключениями
         self.scrollable_label_button_frame = sc.ScrollableLabelButtonFrame(self.sidebar_frame, 
@@ -173,7 +159,8 @@ class App(ctk.CTk):
                         sticky="nsew")
 
         self.main_button_1 = button.AcessButton(self,
-                                             text="Поиск")
+                                             text="Поиск",
+                                             command=self.open_input_dialog_event)
         self.main_button_1.grid(row=4, 
                                 column=3,
                                 padx=(10, 10),
@@ -394,11 +381,3 @@ class App(ctk.CTk):
 
     def search(self):
         print("search_button click")
-
-
-
-
-#if __name__ == "__main__":
-#    app = App()
-#    #login.loginwindow()
-#    app.mainloop()
