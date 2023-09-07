@@ -93,8 +93,8 @@ class loginwindow(ctk.CTk):
             conn.commit()
             # закрываем соединение с базой данных
             conn.close()
+            self.window.destroy()  # закрыть окно входа
             test.App()
-            self.window.destroy()
             
 
     #функция открытия окна регистрации
