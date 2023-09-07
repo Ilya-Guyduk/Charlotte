@@ -12,7 +12,7 @@ class ScrollableLabelButtonFrame(customtkinter.CTkScrollableFrame):
 
     def add_item(self, item, image=None):
         label = customtkinter.CTkLabel(self, text=item, image=image, compound="left", padx=5, anchor="w")
-        button = customtkinter.CTkOptionMenu(self, values=["Light", "Dark", "System"], width=100, height=24, dynamic_resizing=True)
+        button = customtkinter.CTkOptionMenu(self, values=["Light", "Dark", "System"], width=100, height=24, dynamic_resizing=True, corner_radius=3)
         if self.command is not None:
             button.configure(command=lambda: self.command(item))
         label.grid(row=len(self.label_list), column=0, pady=(0, 10), sticky="w")
