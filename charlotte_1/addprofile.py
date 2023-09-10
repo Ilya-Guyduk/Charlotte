@@ -10,10 +10,10 @@ class ToplevelWindow(customtkinter.CTkToplevel):
         self.title("Добавить профиль")
 
 
-        self.entry_frame = customtkinter.CTkFrame(self, corner_radius=0)
-        self.entry_frame.grid(sticky="nsew")
+        #self.entry_frame = customtkinter.CTkFrame(self, corner_radius=0)
+        #self.entry_frame.grid(sticky="nsew")
 
-        self.tabview = customtkinter.CTkTabview(self.entry_frame, corner_radius=3)
+        self.tabview = customtkinter.CTkTabview(self, corner_radius=3)
         self.tabview.grid(sticky="nsew")
         self.tabview.add("Сервер")
         self.tabview.add("Кластер")

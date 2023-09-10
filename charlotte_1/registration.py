@@ -1,98 +1,153 @@
-from tkinter import *
-from tkinter import ttk
-import sqlite3
-import hashlib
-#import main_window
-import secrets
+import customtkinter as ctk
+import widgets
 
+  
+class RegWindow(ctk.CTkTabview):
+    def __init__(self, master):
+        super().__init__(master)
+
+
+        #Вкладки авторизации, регистрации
+        self.regtabview = ctk.CTkTabview(self,
+                                         border_width=1,
+                                         corner_radius=3,
+                                         segmented_button_fg_color=("#5A5757"),
+                                         border_color=("#5A5757"),
+                                         segmented_button_selected_color=("#FF8C00"),
+                                         segmented_button_selected_hover_color=("#FF8C00")
+                                         )
+        self.regtabview.grid(row=0,
+                          column=0,
+                          rowspan=3,
+                          sticky="nsew")
+        self.regtabview.add("Авторизация")
+        self.regtabview.add("Регистрация")
+        self.regtabview.tab("Авторизация").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
+        self.regtabview.tab("Регистрация").grid_columnconfigure(0, weight=1)
+
+        #global login_entry
+        self.login_entry = ctk.CTkEntry(self.regtabview.tab("Авторизация"),
+                                            placeholder_text="Пользователь",
+                                            corner_radius=3)
+        self.login_entry.grid(row=0,
+                              column=0,
+                              pady=(30, 0)
+                              )
+        
+        self.password_entry = ctk.CTkEntry(self.regtabview.tab("Авторизация"),
+                                            placeholder_text="Пароль",
+                                            show="*",
+                                            corner_radius=3)
+        self.password_entry.grid(row=1,
+                                 column=0,
+                                 pady=(10, 0)
+                                 )
+
+        self.conn_menu = widgets.SimpleMenu(self.regtabview.tab("Авторизация"),
+                                            values=["Value 1", "Value 2", "Value Long Long Long"],
+                                            command=self.open_input_dialog_event
+                                            )
+        self.conn_menu.grid(row=2,
+                            column=0,
+                            pady=(10, 0)
+                            )
+
+
+        self.enabled_on = "Пользователь сохранен!"
+        self.enabled_off = "Сохранить пользователя"
+        self.enabled = ctk.StringVar(value=self.enabled_off)
+
+        self.checkbutton = ctk.CTkCheckBox(self.regtabview.tab("Авторизация"),
+                                           textvariable=self.enabled,
+                                           variable=self.enabled, 
+                                           offvalue=self.enabled_off,
+                                           onvalue=self.enabled_on,
+                                           corner_radius=4,
+                                           border_width=1,
+                                           hover_color=("#FF8C00"),
+                                           font=ctk.CTkFont(family="Courier new")
+                                           )
+        self.checkbutton.grid(row=3,
+                              column=0,
+                              columnspan=2,
+                              pady=(10, 0)
+                              )
+        self.checkbutton.configure(state="disabled")
+
+        # Привязка обработчика событий к полям
+        #login_entry.bind('<Key>', self.on_entry_change)
+        #self.password_entry.bind('<Key>', self.on_entry_change)
+
+
+        self.login_entry = ctk.CTkEntry(self.regtabview.tab("Регистрация"),
+                                            placeholder_text="Логин",
+                                            corner_radius=3)
+        self.login_entry.grid(row=0,
+                              column=0,
+                              pady=(30, 0)
+                              )
+
+        self.login_entry = ctk.CTkEntry(self.regtabview.tab("Регистрация"),
+                                            placeholder_text="Имя пользователя",
+                                            corner_radius=3)
+        self.login_entry.grid(row=1,
+                              column=0,
+                              pady=(10, 0)
+                              )
 
         
+        self.password_entry = ctk.CTkEntry(self.regtabview.tab("Регистрация"),
+                                            placeholder_text="Пароль",
+                                            show="*",
+                                            corner_radius=3)
+        self.password_entry.grid(row=2,
+                                 column=0,
+                                 pady=(10, 0)
+                                 )
+
+        self.password_entry = ctk.CTkEntry(self.regtabview.tab("Регистрация"),
+                                            placeholder_text="Повторите пароль",
+                                            show="*",
+                                            corner_radius=3)
+        self.password_entry.grid(row=3,
+                                 column=0,
+                                 pady=(10, 0)
+                                 )
+
+        self.conn_menu = widgets.SimpleMenu(self.regtabview.tab("Регистрация"),
+                                            values=["Подключиться к базе", "Создать новое пространство"])
+        self.conn_menu.grid(row=4,
+                            column=0,
+                            pady=(10, 0)
+                            )
+
+        self.enabled_on = "Пользователь сохранен!"
+        self.enabled_off = "Сохранить пользователя"
+        self.enabled = ctk.StringVar(value=self.enabled_off)
+
+        self.checkbutton = ctk.CTkCheckBox(self.regtabview.tab("Регистрация"),
+                                           textvariable=self.enabled,
+                                           variable=self.enabled, 
+                                           offvalue=self.enabled_off,
+                                           onvalue=self.enabled_on,
+                                           corner_radius=4,
+                                           border_width=1,
+                                           hover_color=("#FF8C00"),
+                                           font=ctk.CTkFont(family="Courier new")
+                                           )
+        self.checkbutton.grid(row=5,
+                              column=0,
+                              columnspan=2,
+                              pady=(10, 20)
+                              )
+        self.checkbutton.configure(state="disabled")
 
 
-def generate_token():
-    return secrets.token_hex(16)
+    def open_input_dialog_event():
+        pass
 
-def login():
-    # подключаемся к базе данных
-    conn = sqlite3.connect('Charlotte')
-    cursor = conn.cursor()
-
-    
-
-    login = login_entry.get()
-    password = password_entry.get()
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
-
-        # добавляем новую запись в таблицу
-    cursor.execute("INSERT INTO users (login, password) VALUES (?, ?)", (login, hashed_password))
-
-    token = generate_token()
-    cursor.execute("INSERT INTO sessions (token) VALUES (?)", (token))
-    conn.commit()
-
-    # закрываем соединение с базой данных
-    conn.close()
-    register_window.destroy()
-
-
-def cancel():
-    register_window.destroy()
-
-def reg_window():
-    global register_window
-    register_window = Toplevel()
-    register_window.title("Charlotte 0.01v")
-    icon = PhotoImage(file = "logo2.png")
-    register_window.iconphoto(True, icon)
-    # получаем размеры экрана
-    screen_width = register_window.winfo_screenwidth()
-    screen_height = register_window.winfo_screenheight()
-        # задаем размеры окна
-    window_width = 500
-    window_height = 400
-    # вычисляем координаты для центрирования окна
-    x = (screen_width // 2) - (window_width // 2)
-    y = (screen_height // 2) - (window_height // 2)
-
-    # задаем расположение окна и его размеры
-    register_window.geometry('{}x{}+{}+{}'.format(window_width, window_height, x, y))
-
-    #login_label = ttk.Label(text="Регистрация", font=("Arial", 22))
-    #login_label.pack(side=TOP, padx=5, pady=20)
-
-        
-    login_label = ttk.Label(register_window, text="Логин:", font=("Arial", 16))
-    login_label.grid(row=0, column=0)
-        
-    login_entry = ttk.Entry(register_window)
-    login_entry.grid(row=0, column=1)
-    
-    password_label = ttk.Label(register_window, text="Пароль:", font=("Arial", 16))
-    password_label.grid(row=1, column=0, padx=5, pady=5)
-        
-    password_entry = ttk.Entry(register_window, show="*")
-    password_entry.grid(row=1, column=1, padx=5, pady=5)
-    
-    warning_label = ttk.Label(register_window, text="")
-    warning_label.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
-
-    login_label = ttk.Label(register_window, text="Импорт конфигурации", font=("Arial", 16))
-    login_label.grid(row=2, column=0, columnspan=2, padx=6, pady=6)
-
-    #enabled_on = "Пользователь сохранен!"
-    #enabled_off = "Запомнить пользователя"
-    #enabled = StringVar(register_windowm, value=enabled_off)
-
-    #checkbutton = ttk.Checkbutton(register_windowm, textvariable=enabled, variable=enabled,  offvalue=enabled_off, onvalue=enabled_on)
-    #checkbutton.grid(row=2, column=0, columnspan=2, padx=6, pady=6)
-        
-    login_button = ttk.Button(register_window, text="Создать", command=login)
-    login_button.grid(row=4, column=0, padx=5, pady=5, sticky=W)
-        
-    cancel_button = ttk.Button(register_window, text="Отмена", command=cancel)
-    cancel_button.grid(row=4, column=1, padx=5, pady=5, sticky=E)
-
-    register_window.mainloop()
-
-
+    #def on_entry_change(self):
+    #    # Проверка, заполнены ли поля
+    #    if self.login_entry.get() and self.password_entry.get():
+    #        self.checkbutton.configure(state="normal")
+      
