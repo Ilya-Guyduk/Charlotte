@@ -1,131 +1,144 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter import font
 import sqlite3
 import hashlib
-import test
+import main
 import registration #модуль с окном регистрации
+from registration import RegWindow #модуль с окном регистрации
 import secrets
 from datetime import datetime
-import ttkthemes 
-import sv_ttk
-import db #модуль с подключением к бд
+#import db #модуль с подключением к бд
+import customtkinter as ctk
+from PIL import Image
+import os
+import button
+import tkinter.messagebox as tkmb
+import test
 
 
-#функция генерации токена для сесии 
-def generate_token():
-    return secrets.token_hex(16)
+class loginWindow(ctk.CTk):
+    #функция основного окна
+    def __init__(self):
+        super().__init__()
+        current_dir = os.path.dirname(os.path.abspath(__file__))
 
-def login():
-    # Подключение к базе данных
-    conn = sqlite3.connect('charlotte')
-    # Создание курсора для выполнения запросов
-    cursor = conn.cursor()
-    login = login_entry.get()
-    password = password_entry.get()
-    global state
-    #state = 0
-    if enabled == "Пользователь сохранен!":
-        state = enabled.get()
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
-    result = cursor.fetchone()
-    if result:
-        login_time = datetime.now()
-        user = cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
-        token = generate_token()
-        cursor.execute("INSERT INTO sessions (user_id, token, login_time, save_user) VALUES (?, ?, ?, ?)", (user, token, login_time, state))
-        conn.commit()
-        # закрываем соединение с базой данных
-        conn.close()
-        test.main_window()
-        window.destroy()
+
+        self.title("Charlotte 0.01v - Войти")
+        
+        #self.iconify("logo2.png")
+        #self.iconphoto(True, self.icon)
+        #self.geometry(f"{1100}x{580}") 
+        self.resizable(False, False)
+        #========================================================
+
+        #Вставляем логотип
+        self.logo = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")),
+                                 size=(140, 140))
+        self.label = ctk.CTkLabel(self,
+                                  image=self.logo,
+                                  text=" Charlotte",
+                                  font=ctk.CTkFont(family="Mont ExtraLight DEMO",size=25),
+                                  compound="left")
+        self.label.grid(row=0,
+                        column=0,
+                        padx=(5, 0),
+                        pady=(10, 5),
+                        sticky="nsew")        
+        #=========================================================
+
+        #Вкладки авторизации, регистрации
+        self.reg_window = registration.RegWindow(self)
+        self.reg_window.grid(row=1,
+                             padx=5,
+                             pady=(0, 5),
+                             column=0,
+                             sticky="nsew")
         
 
-#функция открытия окна регистрации
-def register():
-    registration.reg_window()
 
-#функция закрытия окна по нажатию на кнопку "cancel"
-def cancel():
-    window.destroy()
 
-#функция основного окна
-def login_window():
-    global window
-    window = Tk()
-    #window.style = ttkthemes.ThemedStyle(theme="equilux")
-    window.title("Charlotte 0.01v - Войти")
-    icon = PhotoImage(file = "logo2.png")
-    window.iconphoto(True, icon)
+        #Фрейм окна с кнопками
+        self.button_frame = ctk.CTkFrame(self,
+                                         corner_radius=0,
+                                         border_width=1)
+        self.button_frame.grid(row=2,
+                               column=0,
+                               sticky="nsew")
 
-    #custom_font = font.Font(family="Cousine")
+        self.button_frame.grid_columnconfigure((0, 1), weight=1)
 
-    # получаем размеры экрана
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-    # задаем размеры окна
-    window_width = 400
-    window_height = 230
-    # вычисляем координаты для центрирования окна
-    x = (screen_width // 2) - (window_width // 2)
-    y = (screen_height // 2) - (window_height // 2)
-    # задаем расположение окна и его размеры
-    window.geometry('{}x{}+{}+{}'.format(window_width, window_height, x, y))
-    #запрещаем изменение размера окна 
-    window.resizable(False, False)
 
-    #Вставляем логотип
-    logo = PhotoImage(file="logo2.png")
-    logo = logo.subsample(2, 2)  #уменьшение в 2 раза по x и y
-    label = ttk.Label(image=logo)
-    label.grid(row=0, column=0, rowspan=7)        
 
-    login_label = ttk.Label(text="Логин:")
-    login_label.grid(row=0, column=1, sticky=W, pady=5, padx=5)
-    
-    global login_entry
-    login_entry = ttk.Entry()
-    login_entry.grid(row=1, column=1, columnspan=3, sticky="nsew", padx=5)
-    
-    password_label = ttk.Label(text="Пароль:") #
-    password_label.grid(row=2, column=1, sticky=W, pady=5, padx=5)
-    
-    global password_entry
-    password_entry = ttk.Entry(show="*")
-    password_entry.grid(row=3, column=1, columnspan=3, sticky="nsew", padx=5)
+        self.login_button = button.AcessButton(self.button_frame,
+                                                text="Войти",
+                                                command=self.log_entry)
+        self.login_button.grid(row=1,
+                               column=0,
+                               pady=(10, 10),
+                               padx=(10, 10),
+                               sticky="nsew")
+            
+        self.cancel_button = button.CancelButton(self.button_frame,
+                                                text="Отмена",
+                                                command=self.cancel)
+        self.cancel_button.grid(row=1,
+                                column=1,
+                                pady=(10, 10),
+                                padx=(10, 10),
+                                sticky="nsew")
 
-    #warning_label = ttk.Label(text="")
-    #warning_label.grid(row=4, column=1, columnspan=3, padx=5, pady=5)
 
-    enabled_on = "Пользователь сохранен!"
-    enabled_off = "Сохранить пользователя"
-    global enabled
-    enabled = StringVar(value=enabled_off)
+    #def on_entry_change(self, event):
+    #    # Проверка, заполнены ли поля
+    #    if self.login_entry.get() and self.password_entry.get():
+    #        self.checkbutton.config(state="normal")
+    #    else:
+    #        self.checkbutton.config(state="disabled")
 
-    checkbutton = ttk.Checkbutton(textvariable=enabled, variable=enabled,  offvalue=enabled_off, onvalue=enabled_on)
-    checkbutton.grid(row=4, column=1, columnspan=3, pady=5, padx=5)
+
+    #функция генерации токена для сесии 
+    def generate_token(self):
+        return secrets.token_hex(16)
+
+    def log_entry(self):
+        self.conn = sqlite3.connect('Charlotte')
+        self.cursor = self.conn.cursor()            
+
+
+        self.data_entry = registration.RegWindow(self)
+        login = self.data_entry.login_entry.get()
+        password = self.data_entry.password_entry.get()
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        print(login)
         
-    login_button = ttk.Button(text="Принять", command=login)
-    login_button.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
-        
-    cancel_button = ttk.Button(text="Отмена", command=cancel)
-    cancel_button.grid(row=5, column=2, padx=5, pady=5, sticky="nsew")
-        
-    register_label = ttk.Button(text="Зарегистрироваться", command=register)
-    register_label.grid(row=6, column=1, columnspan=2, pady=5, sticky="nsew")
+        self.cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
+        self.result = self.cursor.fetchone()
+        if self.result:
+            login_time = datetime.now()
+            user = self.cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
+            token = self.generate_token()
 
-    sv_ttk.set_theme("dark")
+            state = 0
+            if self.enabled == "Пользователь сохранен!":
+                state = 1
+            self.cursor.execute("INSERT INTO sessions (user_id, token, login_time, save_user) VALUES (?, ?, ?, ?)", (user, token, login_time, state))
+            self.conn.commit()
+            # закрываем соединение с базой данных
+            self.conn.close()
+            #tkmb.showinfo(title="Login Successful",message="You have logged in Successfully")
+            self.destroy()  # закрыть окно входа
+            test.App()
+            return 6
+        else:
+            print(login)
 
-    window.grid_rowconfigure(0, weight=1)
-    window.grid_rowconfigure(1, weight=1)
-    window.grid_rowconfigure(2, weight=1)
-    window.grid_columnconfigure(0, weight=1)
-
-    window.mainloop()
+    #функция закрытия окна по нажатию на кнопку "cancel"
+    def cancel(self):
+        self.destroy()
 
 
 
-login_window()
+if __name__ == "__main__":
+    app = loginWindow()
+    app.mainloop()
+
 
 
