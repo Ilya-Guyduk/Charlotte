@@ -13,6 +13,10 @@ import button
 import tkinter.messagebox as tkmb
 import test
 
+ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
+
 
 class loginWindow(ctk.CTk):
     #функция основного окна
@@ -30,7 +34,9 @@ class loginWindow(ctk.CTk):
         #========================================================
 
         #Вставляем логотип
-        self.logo = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")),
+        self.logo = ctk.CTkImage(Image.open(os.path.join(current_dir, 
+        												 "img",
+        												 "logo2.png")),
                                  size=(140, 140))
         self.label = ctk.CTkLabel(self,
                                   image=self.logo,
@@ -51,7 +57,7 @@ class loginWindow(ctk.CTk):
                              pady=(0, 5),
                              column=0,
                              sticky="nsew")
-        
+        #=========================================================
 
 
 
@@ -62,7 +68,6 @@ class loginWindow(ctk.CTk):
         self.button_frame.grid(row=2,
                                column=0,
                                sticky="nsew")
-
         self.button_frame.grid_columnconfigure((0, 1), weight=1)
 
 
@@ -99,23 +104,26 @@ class loginWindow(ctk.CTk):
         return secrets.token_hex(16)
 
     def log_entry(self):
+
+        self.login = self.reg_window.login_entry.get()
+        self.password = self.reg_window.login_password_entry.get()
+
         self.conn = sqlite3.connect('Charlotte')
         self.cursor = self.conn.cursor()            
 
-
-        self.data_entry = registration.RegWindow(self)
-        login = self.data_entry.login_entry.get()
-        password = self.data_entry.password_entry.get()
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        print(login)
         
-        self.cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (login, hashed_password))
+
+        hashed_password = hashlib.sha256(self.password.encode()).hexdigest()
+        print(self.login, self.password)
+        
+        self.cursor.execute("SELECT * FROM users WHERE login = ? AND password = ?", (self.login, hashed_password))
         self.result = self.cursor.fetchone()
         if self.result:
             login_time = datetime.now()
-            user = self.cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0]
+            user = self.cursor.execute("SELECT user_id FROM users WHERE login = ? AND password = ?", (self.login, hashed_password)).fetchone()[0]
             token = self.generate_token()
 
+            self.enabled = self.reg_window.enabled
             state = 0
             if self.enabled == "Пользователь сохранен!":
                 state = 1
@@ -127,8 +135,7 @@ class loginWindow(ctk.CTk):
             self.destroy()  # закрыть окно входа
             test.App()
             return 6
-        else:
-            print(login)
+        
 
     #функция закрытия окна по нажатию на кнопку "cancel"
     def cancel(self):
