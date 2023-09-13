@@ -13,20 +13,21 @@ import button
 import tkinter.messagebox as tkmb
 import test
 
+#дефолтные настройки системы
 ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-
+#==========================================================================================
 
 
 class loginWindow(ctk.CTk):
     #функция основного окна
     def __init__(self):
         super().__init__()
+
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
         self.title("Charlotte 0.01v - Войти")
-        
         #self.iconify("logo2.png")
         #self.iconphoto(True, self.icon)
         #self.geometry(f"{1100}x{580}") 
@@ -71,7 +72,6 @@ class loginWindow(ctk.CTk):
         self.button_frame.grid_columnconfigure((0, 1), weight=1)
 
 
-
         self.login_button = button.AcessButton(self.button_frame,
                                                 text="Войти",
                                                 command=self.log_entry)
@@ -89,14 +89,6 @@ class loginWindow(ctk.CTk):
                                 pady=(10, 10),
                                 padx=(10, 10),
                                 sticky="nsew")
-
-
-    #def on_entry_change(self, event):
-    #    # Проверка, заполнены ли поля
-    #    if self.login_entry.get() and self.password_entry.get():
-    #        self.checkbutton.config(state="normal")
-    #    else:
-    #        self.checkbutton.config(state="disabled")
 
 
     #функция генерации токена для сесии 
@@ -143,9 +135,7 @@ class loginWindow(ctk.CTk):
 
 
 
-if __name__ == "__main__":
-    app = loginWindow()
-    app.mainloop()
+
 
 
 

@@ -391,6 +391,8 @@ class App(ctk.CTkToplevel):
         print("search_button click")
 
 
+
+
 if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+    log = login.loginWindow()    
+    log.mainloop()
