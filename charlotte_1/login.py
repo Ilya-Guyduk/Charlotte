@@ -2,7 +2,6 @@ import sqlite3
 import hashlib
 import main
 import registration #модуль с окном регистрации
-from registration import RegWindow #модуль с окном регистрации
 import secrets
 from datetime import datetime
 #import db #модуль с подключением к бд
@@ -18,8 +17,7 @@ ctk.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 #==========================================================================================
 
-
-class loginWindow(ctk.CTk):
+class loginWindow(ctk.CTkToplevel):
     #функция основного окна
     def __init__(self):
         super().__init__()
@@ -27,30 +25,29 @@ class loginWindow(ctk.CTk):
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-        self.title("Charlotte 0.01v - Войти")
+        
+        self.title("Charlotte 0.01v")
         #self.iconify("logo2.png")
         #self.iconphoto(True, self.icon)
         #self.geometry(f"{1100}x{580}") 
         self.resizable(False, False)
         #========================================================
-
         #Вставляем логотип
         self.logo = ctk.CTkImage(Image.open(os.path.join(current_dir, 
         												 "img",
         												 "logo2.png")),
                                  size=(140, 140))
-        self.label = ctk.CTkLabel(self,
+        self.logo = ctk.CTkLabel(self,
                                   image=self.logo,
                                   text=" Charlotte",
                                   font=ctk.CTkFont(family="Mont ExtraLight DEMO",size=25),
                                   compound="left")
-        self.label.grid(row=0,
+        self.logo.grid(row=0,
                         column=0,
                         padx=(5, 0),
-                        pady=(10, 5),
+                        pady=(10, 0),
                         sticky="nsew")        
         #=========================================================
-
         #Вкладки авторизации, регистрации
         self.reg_window = registration.RegWindow(self)
         self.reg_window.grid(row=1,
@@ -59,9 +56,6 @@ class loginWindow(ctk.CTk):
                              column=0,
                              sticky="nsew")
         #=========================================================
-
-
-
         #Фрейм окна с кнопками
         self.button_frame = ctk.CTkFrame(self,
                                          corner_radius=0,
@@ -70,7 +64,6 @@ class loginWindow(ctk.CTk):
                                column=0,
                                sticky="nsew")
         self.button_frame.grid_columnconfigure((0, 1), weight=1)
-
 
         self.login_button = button.AcessButton(self.button_frame,
                                                 text="Войти",
@@ -95,8 +88,17 @@ class loginWindow(ctk.CTk):
     def generate_token(self):
         return secrets.token_hex(16)
 
-    def log_entry(self):
+    #функция смены названия кнопки
+    def on_tab_change(self):
+    	
+    	selected_tab = tab_control.index(tab_control.select())
+    	if selected_tab == 0:
+        	self.login_button.configure(text='Войти')
+    	elif selected_tab == 1:
+        	self.login_button.configure(text='Создать')
 
+    #
+    def log_entry(self):
         self.login = self.reg_window.login_entry.get()
         self.password = self.reg_window.login_password_entry.get()
 
@@ -132,8 +134,6 @@ class loginWindow(ctk.CTk):
     #функция закрытия окна по нажатию на кнопку "cancel"
     def cancel(self):
         self.destroy()
-
-
 
 
 

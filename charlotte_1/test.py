@@ -14,10 +14,9 @@ import widgets
 
 
 
-class App(ctk.CTkToplevel):
+class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-
         #настройки основного окна
         self.title("Charlotte v0.01")
         self.geometry(f"{1100}x{580}")
@@ -40,7 +39,6 @@ class App(ctk.CTkToplevel):
         self.optionmenu.grid_columnconfigure(0,
                                              weight=0)
         #====================================================
-
         #фрейм сайдбара с виджетами
         self.sidebar_frame = ctk.CTkFrame(self)
         self.sidebar_frame.grid(row=1,
@@ -50,15 +48,14 @@ class App(ctk.CTkToplevel):
         self.sidebar_frame.grid_rowconfigure(4,
                                              weight=1)
         #=====================================================
-
         #лого на главном экране
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.logo = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")),
+        self.logo_label = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")),
                                  size=(30, 30))
         self.logo_label = ctk.CTkLabel(self.sidebar_frame,
                                        text=" Charlotte",
                                        font=ctk.CTkFont(family="Mont ExtraLight DEMO",size=20),
-                                       image=self.logo,
+                                       image=self.logo_label,
                                        compound="left")
         self.logo_label.grid(row=0,
                              column=0,
@@ -67,8 +64,6 @@ class App(ctk.CTkToplevel):
                              columnspan=2,
                              sticky="w")
         #======================================================================================
-
-
         #сайдбар с кнопками 
         self.button_frame = ctk.CTkFrame(self.sidebar_frame,
                                          corner_radius=0)
@@ -99,7 +94,6 @@ class App(ctk.CTkToplevel):
         self.button_3.grid(row=1,
                            column=3)
         #=====================================================================================
-        
         #Меню с подключениями
         self.scrollable_label_button_frame = sc.ScrollableLabelButtonFrame(self.sidebar_frame, 
                                                                            command=self.label_button_frame_event,
@@ -116,7 +110,6 @@ class App(ctk.CTkToplevel):
                                                                                                              "img",
                                                                                                              "conn.png"))))
         #======================================================================================================================
-
         #доп опции
         self.appearance_mode_label = ctk.CTkLabel(self.sidebar_frame,
                                                             text="Оформление:"
@@ -150,7 +143,6 @@ class App(ctk.CTkToplevel):
                                       pady=(0, 10))
         self.scaling_optionemenu.set("100%")
         #==========================================================================================
-
         # поисковая строка и кнопка
         self.entry = ctk.CTkEntry(self,
                                   placeholder_text="Поиск",
@@ -172,8 +164,6 @@ class App(ctk.CTkToplevel):
                                 pady=(5, 10),
                                 sticky="nsew")
         #=========================================================================================
-
-
         # create textbox
         self.textbox = ctk.CTkTextbox(self,
                                                 width=250,
@@ -185,8 +175,7 @@ class App(ctk.CTkToplevel):
                           padx=(10, 0),
                           pady=(10, 0),
                           sticky="nsew")
-        
-
+        #=========================================================================================
         # create tabview
         self.tabview = ctk.CTkTabview(self,
                                                 width=250,
@@ -371,7 +360,6 @@ class App(ctk.CTkToplevel):
             self.toplevel_window = addprofile.ToplevelWindow(self)  # create window if its None or destroyed
         else:
             self.toplevel_window.focus()  # if window exists focus it
-
         self.toplevel_window.after(100, self.toplevel_window.lift)
 
     def change_appearance_mode_event(self, new_appearance_mode: str):
@@ -394,5 +382,7 @@ class App(ctk.CTkToplevel):
 
 
 if __name__ == "__main__":
-    log = login.loginWindow()    
+   
+    log = login.loginWindow()
+    #root.log()    
     log.mainloop()
