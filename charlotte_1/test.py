@@ -1,4 +1,3 @@
-import tkinter
 import customtkinter as ctk
 import scrollableLabelButtonFrame as sc
 import addprofile
@@ -7,10 +6,10 @@ from PIL import Image
 import button 
 import mainMenu
 import menuBar
-import login
+import globaldata
 import widgets
-
-
+import sqlite3
+#import threading
 
 
 
@@ -18,6 +17,8 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         #настройки основного окна
+        #self.conn = sqlite3.connect('Charlotte')
+        #self.cursor = self.conn.cursor()
         self.title("Charlotte v0.01")
         self.geometry(f"{1100}x{580}")
         
@@ -40,7 +41,9 @@ class App(ctk.CTk):
                                              weight=0)
         #====================================================
         #фрейм сайдбара с виджетами
-        self.sidebar_frame = ctk.CTkFrame(self)
+        self.sidebar_frame = ctk.CTkFrame(self,
+                                          corner_radius=0
+                                          )
         self.sidebar_frame.grid(row=1,
                                 column=0,
                                 rowspan=5,
@@ -50,12 +53,12 @@ class App(ctk.CTk):
         #=====================================================
         #лого на главном экране
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.logo_label = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")),
+        logo_main = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")),
                                  size=(30, 30))
         self.logo_label = ctk.CTkLabel(self.sidebar_frame,
                                        text=" Charlotte",
                                        font=ctk.CTkFont(family="Mont ExtraLight DEMO",size=20),
-                                       image=self.logo_label,
+                                       image=logo_main,
                                        compound="left")
         self.logo_label.grid(row=0,
                              column=0,
@@ -66,49 +69,80 @@ class App(ctk.CTk):
         #======================================================================================
         #сайдбар с кнопками 
         self.button_frame = ctk.CTkFrame(self.sidebar_frame,
-                                         corner_radius=0)
+                                         corner_radius=4,
+                                         border_width=1, #ширина рамки
+                                         fg_color="transparent" #цвет фона
+                                         )
         self.button_frame.grid(row=1,
                                column=0,
                                columnspan=2,
+                               padx=1,
                                sticky="nsew")
         self.button_1 = button.LittleAcessButton(self.button_frame,
                                                  text="+",
                                                  command=self.open_input_dialog_event)
-        self.button_1.grid(row=1,
+        self.button_1.grid(row=0,
                            column=0)
 
         self.button_2 = button.LittleAcessButton(self.button_frame,
                                                  text="+c",
                                                  command=self.open_input_dialog_event)
-        self.button_2.grid(row=1,
+        self.button_2.grid(row=0,
                            column=1)
 
         self.button_3 = button.LittleAcessButton(self.button_frame,
                                                  text="g",
                                                  command=self.open_input_dialog_event)
-        self.button_3.grid(row=1,
+        self.button_3.grid(row=0,
                            column=2)
 
         self.button_3 = button.LittleOwnButton(self.button_frame,
                                                text="?")
-        self.button_3.grid(row=1,
+        self.button_3.grid(row=0,
                            column=3)
+        self.button_4 = button.LittleAcessButton(self.button_frame,
+                                               text="@",
+                                               command=self.open_input_dialog_event)
+        self.button_4.grid(row=0,
+                           column=4)
         #=====================================================================================
         #Меню с подключениями
         self.scrollable_label_button_frame = sc.ScrollableLabelButtonFrame(self.sidebar_frame, 
                                                                            command=self.label_button_frame_event,
-                                                                           corner_radius=0
+                                                                           corner_radius=0,
+                                                                           scrollbar_button_hover_color=("#5A5757"),
+                                                                           #fg_color="transparent",
+                                                                           border_width=1, #ширина рамки
                                                                            )
         self.scrollable_label_button_frame.grid(row=4,
                                                 column=0,
                                                 pady=3,
+                                                padx=(1, 0),
                                                 columnspan=2,
                                                 sticky="nsew")
-        for i in range(40):  # цикл для добалвения профилей серверов
-            self.scrollable_label_button_frame.add_item(f"Сервер {i}",
+
+        
+        
+        self.conn = sqlite3.connect('Charlotte')
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT desc_svc FROM SERVERS WHERE account_id = ?", (globaldata.global_id,))
+        desc_name = self.cursor.fetchall()
+        self.cursor.execute("SELECT default_connect FROM SERVERS")
+        def_conn_name = self.cursor.fetchall()
+        
+        for i, desc_name in enumerate(desc_name):  # цикл для добалвения профилей серверов
+            self.scrollable_label_button_frame.add_item(desc_name[0],
+                                                        def_conn_name[0],
                                                         image=ctk.CTkImage(Image.open(os.path.join(current_dir,
                                                                                                              "img",
-                                                                                                             "conn.png"))))
+                                                                                                             "conn.png")))
+                                                                      )
+        
+        self.conn.commit()
+        self.conn.close()
+        # Создаем отдельный поток для обновления записей
+        #self.update_thread = threading.Thread(target=self.update_records)
+        #self.update_thread.start()
         #======================================================================================================================
         #доп опции
         self.appearance_mode_label = ctk.CTkLabel(self.sidebar_frame,
@@ -230,7 +264,7 @@ class App(ctk.CTk):
                                     pady=(10, 0),
                                     sticky="nsew")
 
-        self.radio_var = tkinter.IntVar(value=0)
+        self.radio_var = ctk.IntVar(value=0)
         self.label_radio_group = ctk.CTkLabel(master=self.radiobutton_frame,
                                                         text="CTkRadioButton Group:")
         self.label_radio_group.grid(row=0,
@@ -355,6 +389,41 @@ class App(ctk.CTk):
         #self.seg_button_1.set("Value 2")
         self.toplevel_window = None
 
+
+
+    #def update_records(self):
+    #    conn = sqlite3.connect('Charlotte')
+    #    cursor = conn.cursor()
+
+    #    while True:
+            # Выполняем запрос SELECT
+    #        cursor.execute("SELECT desc_svc FROM SERVERS")
+    #        results = cursor.fetchall()
+
+            # Обновляем интерфейс в главном потоке
+    #        self.after(1000, self.update_interface, results)
+
+            # Задержка перед следующей проверкой
+            #time.sleep(1)  # Настройте нужное вам время задержки
+
+    #    cursor.close()
+    #    conn.close()
+
+    #def update_interface(results):
+    #    conn = sqlite3.connect('Charlotte')
+    #    cursor = conn.cursor()
+    #    cursor.execute("SELECT desc_svc FROM SERVERS")
+    #    results = cursor.fetchall()
+    #    for i, result in enumerate(results):  # цикл для добалвения профилей серверов
+    #        self.scrollable_label_button_frame.add_item(result[0],
+    #                                                    image=ctk.CTkImage(Image.open(os.path.join(current_dir,
+    #                                                                                                         "img",
+    #                                                                                                         "conn.png")))
+    #                                                                  )
+
+
+
+
     def open_input_dialog_event(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             self.toplevel_window = addprofile.ToplevelWindow(self)  # create window if its None or destroyed
@@ -381,8 +450,6 @@ class App(ctk.CTk):
 
 
 
-if __name__ == "__main__":
-   
-    log = login.loginWindow()
-    #root.log()    
-    log.mainloop()
+if __name__ == '__main__':
+    app = App()
+    app.mainloop()

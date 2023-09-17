@@ -6,22 +6,22 @@ import hashlib
 from PIL import Image
 import os 
 import time
-import globaldata
 
-class ToplevelWindow(ctk.CTkToplevel):
+class ServerWindow(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #self.geometry("500x400")
-        self.title("Добавить профиль")
+        #self.title(title)
+        self.grid_rowconfigure(0, weight=0)
         current_dir = os.path.dirname(os.path.abspath(__file__))
         self.logo_reg = ctk.CTkImage(Image.open(os.path.join(current_dir, 
                                                                                                          "img",
                                                                                                          "logo2.png")),
-                                 size=(70, 70))
+                                 size=(30, 30))
         self.logo = ctk.CTkLabel(self,
                                   image=self.logo_reg,
-                                  text=" Charlotte",
-                                  font=ctk.CTkFont(family="Mont ExtraLight DEMO",size=25),
+                                  text=" -> SERVER -> admin@192.168.0.1 -> V",
+                                  font=ctk.CTkFont(family="Courier new",size=17),
                                   compound="left")
         self.logo.grid(row=0,
                         column=0,
@@ -29,18 +29,35 @@ class ToplevelWindow(ctk.CTkToplevel):
                         pady=(10, 0),
                         sticky="nsw")
 
+        #self.textbox = ctk.CTkTextbox(self,
+        #                                        #width=150,
+        #                                        height=50,
+        #                                        corner_radius=3,
+        #                                        text_color=("#5A5757")
+        #                                        )
+        #self.textbox.insert("0.0",
+        #                    "-> " + "SERVER " + "-> " "admin@192.168.0.1 " + "-> " "V")
+        #self.textbox.grid(row=0,
+        #                  column=0,
+        #                  padx=(10, 10),
+        #                  pady=(10, 0),
+        #                  sticky="nsew"
+        #                  )
+
         self.tabview = tab(self)
         self.tabview.grid(row=1,
                           padx=5,
                           pady=(0, 5),
                           column=0,
                           sticky="nsew")
-        self.tabview.add("Сервер")
-        self.tabview.add("Кластер")
+        self.tabview.add("Описание")
+        self.tabview.add("Подключения")
+        self.tabview.add("Юзеры")
+        self.tabview.add("Настройки")
         #self.tabview.tab("Сервер").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
         #self.tabview.tab("Кластер").grid_columnconfigure(0, weight=1)
 
-        self.alias_svc = ctk.CTkEntry(self.tabview.tab("Сервер"),
+        self.alias_svc = ctk.CTkEntry(self.tabview.tab("Описание"),
                                             placeholder_text="Название(не обязательно)",
                                             corner_radius=3)
         self.alias_svc.grid(row=0,
@@ -49,14 +66,14 @@ class ToplevelWindow(ctk.CTkToplevel):
                         pady=(10, 10),
                         sticky="nsew")
         #комментарий к окну названия
-        self.alias_desc = ctk.CTkLabel(self.tabview.tab("Сервер"),
+        self.alias_desc = ctk.CTkLabel(self.tabview.tab("Описание"),
                                                     text="Имя по умолчанию - IP-адрес",
                                                     text_color=("#5A5757")
                                                     )
         self.alias_desc.grid(row=0,
                              column=1)
 
-        self.ip_adress = ctk.CTkEntry(self.tabview.tab("Сервер"),
+        self.ip_adress = ctk.CTkEntry(self.tabview.tab("Описание"),
                                                placeholder_text="IP-адрес",
                                                corner_radius=3)
         self.ip_adress.grid(row=1,
@@ -64,7 +81,7 @@ class ToplevelWindow(ctk.CTkToplevel):
                         padx=(10, 10),
                         pady=(10, 10),
                         sticky="nsew")
-        self.port = ctk.CTkEntry(self.tabview.tab("Сервер"),
+        self.port = ctk.CTkEntry(self.tabview.tab("Описание"),
                                                placeholder_text="Порт(22 по умолчанию)",
                                                corner_radius=3)
         self.port.grid(row=1,
@@ -73,7 +90,7 @@ class ToplevelWindow(ctk.CTkToplevel):
                         pady=(10, 10),
                         sticky="nsew")
 
-        self.user = ctk.CTkEntry(self.tabview.tab("Сервер"), 
+        self.user = ctk.CTkEntry(self.tabview.tab("Описание"), 
                                            placeholder_text="Пользователь",
                                            corner_radius=3)
         self.user.grid(row=2,
@@ -82,7 +99,7 @@ class ToplevelWindow(ctk.CTkToplevel):
                         pady=(10, 10),
                         sticky="nsew")
 
-        self.password = ctk.CTkEntry(self.tabview.tab("Сервер"),
+        self.password = ctk.CTkEntry(self.tabview.tab("Описание"),
                                                placeholder_text="Пароль",
                                                show="*",
                                                corner_radius=3)
@@ -92,7 +109,7 @@ class ToplevelWindow(ctk.CTkToplevel):
                            pady=(10, 10),
                            sticky="nsew")
 
-        self.add_connect = button.LittleOwnButton(self.tabview.tab("Сервер"),
+        self.add_connect = button.LittleOwnButton(self.tabview.tab("Описание"),
                                               text="+")
         self.add_connect.grid(row=2,
                                 column=2,
@@ -103,7 +120,7 @@ class ToplevelWindow(ctk.CTkToplevel):
 
         #окно уведомлений
 
-        self.notification = ctk.CTkLabel(self.tabview.tab("Сервер"),
+        self.notification = ctk.CTkLabel(self.tabview.tab("Описание"),
                                                     text="",
                                                     font=ctk.CTkFont(family="Courier new")
                                                     )
@@ -170,6 +187,7 @@ class ToplevelWindow(ctk.CTkToplevel):
                                     text_color=("#FF8C00"))
             return
 
+        test_token = 2
 
         #Проверка на уже добавленный адрес-порт
         #double = self.cursor.execute("SELECT svc_id FROM SVC_CONNECTS WHERE ip_addr = ? AND port = ?", (adress, int(port))).fetchone()[0]
@@ -180,10 +198,10 @@ class ToplevelWindow(ctk.CTkToplevel):
         #    return
         
 
-        self.cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
+        self.cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (test_token, name))
         self.conn.commit()
 
-        server = self.cursor.execute("SELECT svc_id FROM SERVERS WHERE desc_svc = ? AND account_id = ?", (name, globaldata.global_id)).fetchone()[0]
+        server = self.cursor.execute("SELECT svc_id FROM SERVERS WHERE desc_svc = ? AND account_id = ?", (name, test_token)).fetchone()[0]
 
         if user and hashed_password:
             self.cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server, user, hashed_password))

@@ -1,16 +1,5 @@
-import customtkinter
-import test
-import login
+from login import LoginWindow
 
-
-
-def main():
-    #log = login.loginWindow()
-    #log.mainloop()
-    
-    app = test.App()
-    app.mainloop()
-
-if __name__ == "__main__":
-    main()
-   
+if __name__ == '__main__':
+    login = LoginWindow()
+    login.mainloop()

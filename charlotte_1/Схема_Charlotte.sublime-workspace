@@ -1,0 +1,249 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"wi",
+				"weight"
+			],
+			[
+				"co",
+				"command"
+			],
+			[
+				"p",
+				"password"
+			],
+			[
+				"__",
+				"__init__"
+			],
+			[
+				"Re",
+				"RegWindow"
+			],
+			[
+				"lo",
+				"logo"
+			],
+			[
+				"re",
+				"registration"
+			],
+			[
+				"l",
+				"login"
+			],
+			[
+				"c",
+				"command"
+			],
+			[
+				"st",
+				"state"
+			],
+			[
+				"pa",
+				"password_entry"
+			],
+			[
+				"m",
+				"main_menu"
+			],
+			[
+				"ma",
+				"main_menu"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 130.0,
+		"history":
+		[
+			"test.py",
+			"ls",
+			"python3 test.py"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/registration.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/test.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/login.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/mainMenu.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/button.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/addprofile.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/scrollableLabelButtonFrame.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/menuBar.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/widgets.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/prentice/client.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/options.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/main.py",
+		"/C/Users/elaga/OneDrive/Рабочий стол/test.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/py_prentice.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/prentice.conf",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/prentice.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/alerts.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/notebook.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/treeview.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/db.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/test2.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/main_menu.py",
+		"/C/Users/elaga/OneDrive/Рабочий стол/нейронка/AI.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/__init__.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/main_window.py",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/logo2.png",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/charlotte",
+		"/C/Users/elaga/OneDrive/Документы/GitHub/Charlotte/charlotte_1/.DS_Store"
+	],
+	"find":
+	{
+		"height": 27.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "Схема_Charlotte.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

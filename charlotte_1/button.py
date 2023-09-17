@@ -1,7 +1,7 @@
 import customtkinter as ctk
 
 class AcessButton(ctk.CTkButton):
-    def __init__(self, button_frame, text, command):
+    def __init__(self, button_frame, text, command, *args, **kwargs):
         super().__init__(
             button_frame,
             text=text, #текст кнопки
