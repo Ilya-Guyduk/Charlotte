@@ -4,7 +4,6 @@ from tabs import CTkTabview as tab #модуль с окном регистра�
 import widgets
 import secrets
 from datetime import datetime
-#import db #модуль с подключением к бд
 import customtkinter as ctk
 from PIL import Image
 import os

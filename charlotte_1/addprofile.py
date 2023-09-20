@@ -102,7 +102,6 @@ class ToplevelWindow(ctk.CTkToplevel):
         #==================================================================
 
         #окно уведомлений
-
         self.notification = ctk.CTkLabel(self.tabview.tab("Сервер"),
                                                     text="",
                                                     font=ctk.CTkFont(family="Courier new")
