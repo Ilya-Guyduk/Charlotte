@@ -57,76 +57,54 @@ class ServerWindow(ctk.CTkToplevel):
         #self.tabview.tab("Сервер").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
         #self.tabview.tab("Кластер").grid_columnconfigure(0, weight=1)
 
-        self.alias_svc = ctk.CTkEntry(self.tabview.tab("Описание"),
-                                            placeholder_text="Название(не обязательно)",
-                                            corner_radius=3)
-        self.alias_svc.grid(row=0,
-                        column=0,
-                        padx=(10, 10),
-                        pady=(10, 10),
-                        sticky="nsew")
-        #комментарий к окну названия
-        self.alias_desc = ctk.CTkLabel(self.tabview.tab("Описание"),
-                                                    text="Имя по умолчанию - IP-адрес",
-                                                    text_color=("#5A5757")
+        self.status_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text="Статус:",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
                                                     )
-        self.alias_desc.grid(row=0,
+        self.status_label.grid(row=0,
+                             column=0)
+
+        self.fs_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text="Файловая система:",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
+                                                    )
+        self.fs_label.grid(row=1,
+                             column=0)
+
+        self.os_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text="Операционная система:",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
+                                                    )
+        self.os_label.grid(row=3,
+                             column=0)
+
+        self.status_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text="АКТИВЕН",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
+                                                    )
+        self.status_label.grid(row=0,
                              column=1)
 
-        self.ip_adress = ctk.CTkEntry(self.tabview.tab("Описание"),
-                                               placeholder_text="IP-адрес",
-                                               corner_radius=3)
-        self.ip_adress.grid(row=1,
-                        column=0,
-                        padx=(10, 10),
-                        pady=(10, 10),
-                        sticky="nsew")
-        self.port = ctk.CTkEntry(self.tabview.tab("Описание"),
-                                               placeholder_text="Порт(22 по умолчанию)",
-                                               corner_radius=3)
-        self.port.grid(row=1,
-                        column=1,
-                        padx=(10, 10),
-                        pady=(10, 10),
-                        sticky="nsew")
-
-        self.user = ctk.CTkEntry(self.tabview.tab("Описание"), 
-                                           placeholder_text="Пользователь",
-                                           corner_radius=3)
-        self.user.grid(row=2,
-                        column=0,
-                        padx=(10, 10),
-                        pady=(10, 10),
-                        sticky="nsew")
-
-        self.password = ctk.CTkEntry(self.tabview.tab("Описание"),
-                                               placeholder_text="Пароль",
-                                               show="*",
-                                               corner_radius=3)
-        self.password.grid(row=2,
-                           column=1,
-                           padx=(10, 10),
-                           pady=(10, 10),
-                           sticky="nsew")
-
-        self.add_connect = button.LittleOwnButton(self.tabview.tab("Описание"),
-                                              text="+")
-        self.add_connect.grid(row=2,
-                                column=2,
-                                padx=(10, 10),
-                                pady=(10, 10),
-                                sticky="nsew")
-        #==================================================================
-
-        #окно уведомлений
-
-        self.notification = ctk.CTkLabel(self.tabview.tab("Описание"),
-                                                    text="",
-                                                    font=ctk.CTkFont(family="Courier new")
+        self.fs_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text="FHS",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
                                                     )
-        self.notification.grid(sticky="nsew",
-                               columnspan=2)
-        #==================================================================
+        self.fs_label.grid(row=1,
+                             column=1)
+
+        self.os_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text="LINUX",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
+                                                    )
+        self.os_label.grid(row=3,
+                             column=1)
+    
 
         #Фрейм окна с кнопками
         self.button_frame = ctk.CTkFrame(self,

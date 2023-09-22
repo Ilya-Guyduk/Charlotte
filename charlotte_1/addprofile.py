@@ -7,6 +7,7 @@ from PIL import Image
 import os 
 import time
 import globaldata
+import paramiko
 
 class ToplevelWindow(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -135,7 +136,8 @@ class ToplevelWindow(ctk.CTkToplevel):
                                 sticky="nsew")
 
         self.main_button_3 = button.OwnButton(self.button_frame,
-                                              text="Тест")
+                                              text="Тест",
+                                              command=self.test_conf)
         self.main_button_3.grid(row=0,
                                 column=3,
                                 padx=(10, 10),
@@ -207,3 +209,18 @@ class ToplevelWindow(ctk.CTkToplevel):
     #Функция выхода из окна
     def cancel(self):
         self.destroy()
+
+
+    def test_conf(self):
+        print("test")
+        test_adress = self.ip_adress.get()
+        test_port = self.port.get()
+        test_user = self.user.get()
+        test_user_pass = self.password.get()
+        
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=test_adress, username=test_user, password=test_user_pass, port=test_port)
+        stdin, stdout, stderr = client.exec_command('ls')
+        print(stdout.read().decode())
+        client.close()

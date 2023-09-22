@@ -76,6 +76,7 @@ class App(ctk.CTk):
         self.button_frame.grid(row=1,
                                column=0,
                                columnspan=2,
+                               pady=(0, 2),
                                padx=1,
                                sticky="nsew")
         self.button_1 = button.LittleAcessButton(self.button_frame,
@@ -116,8 +117,8 @@ class App(ctk.CTk):
                                                                            )
         self.scrollable_label_button_frame.grid(row=4,
                                                 column=0,
-                                                pady=3,
-                                                padx=(1, 0),
+                                                pady=0,
+                                                padx=(0, 0),
                                                 columnspan=2,
                                                 sticky="nsew")
 

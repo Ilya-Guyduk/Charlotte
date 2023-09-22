@@ -49,7 +49,7 @@ class CancelButton(ctk.CTkButton):
 
 
 class OwnButton(ctk.CTkButton):
-    def __init__(self, button_frame, text):
+    def __init__(self, button_frame, command, text, *args, **kwargs):
         super().__init__(
             button_frame,
             text=text,

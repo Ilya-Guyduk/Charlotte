@@ -18,7 +18,7 @@ class ScrollableLabelButtonFrame(ctk.CTkScrollableFrame):
                               command=self.open_server_window,
                               anchor="w",
                               fg_color="transparent", #цвет фона
-                            border_width=1, #ширина рамки
+                            #border_width=1, #ширина рамки
                             text_color=("gray10", "#DCE4EE"), 
                             corner_radius=0, # радиус закругления
                             hover_color=("#6C6C6C"), #цвет при наведении 
@@ -28,30 +28,31 @@ class ScrollableLabelButtonFrame(ctk.CTkScrollableFrame):
                                        )
         label.grid(row=len(self.label_list),
                    column=0,
-                   pady=(2, 0), 
+                   pady=(0, 0),
+                   padx=2, 
                    sticky="nsew")
         self.label_list.append(label)
 
-        button = ctk.CTkButton(self,
-                              text=item,
-                              #image=image,
-                              command=self.open_server_window,
-                              anchor="w",
-                              fg_color="transparent", #цвет фона
-                            border_width=1, #ширина рамки
-                            text_color=("gray10", "#DCE4EE"), 
-                            corner_radius=0, # радиус закругления
-                            hover_color=("#FF8C00"), #цвет при наведении 
-                            border_color=("#5A5757"), #цвет рамки
-                            border_spacing=0, #отступ от рамки
-                            font=ctk.CTkFont(family="Courier new")
-                                       )
-        button.grid(row=len(self.button_list),
-                    column=1,
-                    pady=(2, 0),
-                    sticky="nsew"
-                    )
-        self.button_list.append(button)
+        #button = ctk.CTkButton(self,
+        #                      text=item,
+        #                      #image=image,
+        #                      command=self.open_server_window,
+        #                      anchor="w",
+        #                      fg_color="transparent", #цвет фона
+        #                    border_width=1, #ширина рамки
+        #                    text_color=("gray10", "#DCE4EE"), 
+        #                    corner_radius=0, # радиус закругления
+        #                    hover_color=("#FF8C00"), #цвет при наведении 
+        #                    border_color=("#5A5757"), #цвет рамки
+        #                    border_spacing=0, #отступ от рамки
+        #                    font=ctk.CTkFont(family="Courier new")
+        #                               )
+        #button.grid(row=len(self.button_list),
+        #            column=1,
+        #            pady=(0, 0),
+        #            sticky="nsew"
+        #            )
+        #self.button_list.append(button)
         #button.set(conn)
         
 
