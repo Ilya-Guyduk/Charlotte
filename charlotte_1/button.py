@@ -49,11 +49,11 @@ class CancelButton(ctk.CTkButton):
 
 
 class OwnButton(ctk.CTkButton):
-    def __init__(self, button_frame, command, text, *args, **kwargs):
+    def __init__(self, button_frame, command, text):
         super().__init__(
             button_frame,
             text=text,
-            #command=command,
+            command=command,
             fg_color="transparent",
             border_width=1,
             text_color=("gray10", "#DCE4EE"),

@@ -136,8 +136,8 @@ class ToplevelWindow(ctk.CTkToplevel):
                                 sticky="nsew")
 
         self.main_button_3 = button.OwnButton(self.button_frame,
-                                              text="Тест",
-                                              command=self.test_conf)
+                                              text="Соединение",
+                                                command=self.test_conf)
         self.main_button_3.grid(row=0,
                                 column=3,
                                 padx=(10, 10),
@@ -149,7 +149,6 @@ class ToplevelWindow(ctk.CTkToplevel):
         # подключаемся к базе данных
         self.conn = sqlite3.connect('Charlotte')
         self.cursor = self.conn.cursor()
-
         #Блок с переменными для создания профиля
         name = self.alias_svc.get()
         adress = self.ip_adress.get()
@@ -157,7 +156,6 @@ class ToplevelWindow(ctk.CTkToplevel):
         user = self.user.get()
         user_pass = self.password.get()
         hashed_password = hashlib.sha256(user_pass.encode()).hexdigest()
-
         if not name:
                 name = adress
         if not port:
@@ -170,8 +168,6 @@ class ToplevelWindow(ctk.CTkToplevel):
             self.notification.configure(text="Невалидное значение порта!",
                                     text_color=("#FF8C00"))
             return
-
-
         #Проверка на уже добавленный адрес-порт
         #double = self.cursor.execute("SELECT svc_id FROM SVC_CONNECTS WHERE ip_addr = ? AND port = ?", (adress, int(port))).fetchone()[0]
         #print(double)
@@ -179,13 +175,9 @@ class ToplevelWindow(ctk.CTkToplevel):
         #    self.notification.configure(text="Данный адрес уже добавлен!",
         #                                text_color=("#FF8C00"))
         #    return
-        
-
         self.cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
         self.conn.commit()
-
         server = self.cursor.execute("SELECT svc_id FROM SERVERS WHERE desc_svc = ? AND account_id = ?", (name, globaldata.global_id)).fetchone()[0]
-
         if user and hashed_password:
             self.cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server, user, hashed_password))
             self.conn.commit()
@@ -197,8 +189,6 @@ class ToplevelWindow(ctk.CTkToplevel):
         else:
             self.cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, ip_addr, port) VALUES (?, ?, ?)", (server, adress, port))
             self.conn.commit()
-        
-
         self.conn.commit()
         # закрываем соединение с базой данных
         self.conn.close()
@@ -206,12 +196,22 @@ class ToplevelWindow(ctk.CTkToplevel):
         self.notification.configure(text="Сервер добавлен",
                                    text_color=("#FF8C00"))
        
-    #Функция выхода из окна
-    def cancel(self):
-        self.destroy()
-
-
     def test_conf(self):
+        #test_window = ctk.CTk()
+        #test_window.geometry("400x300")
+
+
+        #def button_click_event():
+        #    dialog = ctk.CTkInputDialog(text="Type in a number:", title="Test")
+        #    print("Number:", dialog.get_input())
+
+
+        #button = ctk.CTkButton(app, text="Open Dialog", command=button_click_event)
+        #button.pack(padx=20, pady=20)
+
+        #app.mainloop()
+
+
         print("test")
         test_adress = self.ip_adress.get()
         test_port = self.port.get()
@@ -224,3 +224,7 @@ class ToplevelWindow(ctk.CTkToplevel):
         stdin, stdout, stderr = client.exec_command('ls')
         print(stdout.read().decode())
         client.close()
+
+    #Функция выхода из окна
+    def cancel(self):
+        self.destroy()

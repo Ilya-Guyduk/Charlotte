@@ -131,7 +131,8 @@ class ServerWindow(ctk.CTkToplevel):
                                 sticky="nsew")
 
         self.main_button_3 = button.OwnButton(self.button_frame,
-                                              text="Тест")
+                                              text="Тест",
+                                              command=self.cancel)
         self.main_button_3.grid(row=0,
                                 column=3,
                                 padx=(10, 10),
