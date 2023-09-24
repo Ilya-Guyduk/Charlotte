@@ -7,12 +7,28 @@ from PIL import Image
 import os 
 import time
 
+
+#class ServerWindow(tk.Toplevel):
+#    def __init__(self, parent, button_name):
+#        super().__init__(parent)
+#        self.parent = parent
+#        self.button_name = button_name
+
+
 class ServerWindow(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #self.geometry("500x400")
-        #self.title(title)
+        self.title()
         self.grid_rowconfigure(0, weight=0)
+
+
+        #with sqlite3.connect('Charlotte') as conn:
+        #    cursor = conn.cursor()
+        #    cursor.execute("SELECT gefault_user FROM SVC_CONNECTS WHERE login = ? AND password = ?", (login, hashed_password))
+
+
+
         current_dir = os.path.dirname(os.path.abspath(__file__))
         self.logo_reg = ctk.CTkImage(Image.open(os.path.join(current_dir, 
                                                                                                          "img",
@@ -28,21 +44,6 @@ class ServerWindow(ctk.CTkToplevel):
                         padx=(10, 0),
                         pady=(10, 0),
                         sticky="nsw")
-
-        #self.textbox = ctk.CTkTextbox(self,
-        #                                        #width=150,
-        #                                        height=50,
-        #                                        corner_radius=3,
-        #                                        text_color=("#5A5757")
-        #                                        )
-        #self.textbox.insert("0.0",
-        #                    "-> " + "SERVER " + "-> " "admin@192.168.0.1 " + "-> " "V")
-        #self.textbox.grid(row=0,
-        #                  column=0,
-        #                  padx=(10, 10),
-        #                  pady=(10, 0),
-        #                  sticky="nsew"
-        #                  )
 
         self.tabview = tab(self)
         self.tabview.grid(row=1,

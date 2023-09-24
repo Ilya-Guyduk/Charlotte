@@ -94,13 +94,19 @@ class ToplevelWindow(ctk.CTkToplevel):
                            sticky="nsew")
 
         self.add_connect = button.LittleOwnButton(self.tabview.tab("Сервер"),
-                                              text="+")
+                                              text="+",
+                                              command=self.add_entry)
         self.add_connect.grid(row=2,
                                 column=2,
                                 padx=(10, 10),
                                 pady=(10, 10),
                                 sticky="nsew")
         #==================================================================
+
+        self.progressbar_1 = ctk.CTkProgressBar(self.tabview.tab("Сервер"), corner_radius=3)
+        self.progressbar_1.grid(row=3, column=0, columnspan=2, padx=(10, 10), pady=(0, 0), sticky="ew")
+        self.progressbar_1.configure(mode="indeterminnate")
+        self.progressbar_1.start()
 
         #окно уведомлений
         self.notification = ctk.CTkLabel(self.tabview.tab("Сервер"),
@@ -144,87 +150,96 @@ class ToplevelWindow(ctk.CTkToplevel):
                                 pady=(10, 10),
                                 sticky="nsew")
 
+    def add_entry(self):
+        self.user = ctk.CTkEntry(self.tabview.tab("Сервер"), 
+                                           placeholder_text="Пользователь",
+                                           corner_radius=3)
+        self.user.grid(column=0,
+                        padx=(10, 10),
+                        pady=(10, 10),
+                        sticky="nsew")
+
+        self.password = ctk.CTkEntry(self.tabview.tab("Сервер"),
+                                               placeholder_text="Пароль",
+                                               show="*",
+                                               corner_radius=3)
+        self.password.grid(column=1,
+                           padx=(10, 10),
+                           pady=(10, 10),
+                           sticky="nsew")
+
 
     def add_profile(self):
-        # подключаемся к базе данных
-        self.conn = sqlite3.connect('Charlotte')
-        self.cursor = self.conn.cursor()
-        #Блок с переменными для создания профиля
-        name = self.alias_svc.get()
-        adress = self.ip_adress.get()
-        port = self.port.get()
-        user = self.user.get()
-        user_pass = self.password.get()
-        hashed_password = hashlib.sha256(user_pass.encode()).hexdigest()
-        if not name:
-                name = adress
-        if not port:
-                port = 22
-        if not adress:
-            self.notification.configure(text="Не указан IP-адрес!",
-                                    text_color=("#FF8C00"))
-            return        
-        if int(port) > 65536:
-            self.notification.configure(text="Невалидное значение порта!",
-                                    text_color=("#FF8C00"))
-            return
-        #Проверка на уже добавленный адрес-порт
-        #double = self.cursor.execute("SELECT svc_id FROM SVC_CONNECTS WHERE ip_addr = ? AND port = ?", (adress, int(port))).fetchone()[0]
-        #print(double)
-        #if double:
-        #    self.notification.configure(text="Данный адрес уже добавлен!",
-        #                                text_color=("#FF8C00"))
-        #    return
-        self.cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
-        self.conn.commit()
-        server = self.cursor.execute("SELECT svc_id FROM SERVERS WHERE desc_svc = ? AND account_id = ?", (name, globaldata.global_id)).fetchone()[0]
-        if user and hashed_password:
-            self.cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server, user, hashed_password))
-            self.conn.commit()
-            def_user = self.cursor.execute("SELECT user_id FROM SVC_USERS WHERE svc_id = ?", (server,)).fetchone()[0]
-            self.cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, gefault_user, ip_addr, port) VALUES (?, ?, ?, ?)", (server, def_user, adress, port))
-            def_conn = self.cursor.execute("SELECT svc_conn_id FROM SVC_CONNECTS WHERE svc_id = ?", (server,)).fetchone()[0]
-            self.cursor.execute("UPDATE SERVERS SET default_connect = ? WHERE svc_id = ?", (def_conn, server))
-            self.conn.commit()
-        else:
-            self.cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, ip_addr, port) VALUES (?, ?, ?)", (server, adress, port))
-            self.conn.commit()
-        self.conn.commit()
-        # закрываем соединение с базой данных
-        self.conn.close()
-        #Вывод информации о том, что серер добавлен
-        self.notification.configure(text="Сервер добавлен",
-                                   text_color=("#FF8C00"))
-       
+    # подключаемся к базе данных
+        with sqlite3.connect('Charlotte') as conn:
+            cursor = conn.cursor()
+            # получение значений полей ввода
+            name = self.alias_svc.get() or self.ip_adress.get()
+            adress = self.ip_adress.get()
+            port = self.port.get() or 22
+            user = self.user.get()
+            user_pass = self.password.get()
+            hashed_password = hashlib.sha256(user_pass.encode()).hexdigest() if user_pass else None
+            # валидация IP-адреса и порта
+            if not adress:
+                self.notification.configure(text="Не указан IP-адрес!", text_color=("#FF8C00"))
+                return
+            if int(port) > 65536:
+                self.notification.configure(text="Невалидное значение порта!", text_color=("#FF8C00"))
+                return
+            # вставка данных в таблицу SVC_USERS, SVC_CONNECTS и обновление SERVERS
+            if user and hashed_password:
+                # вставка данных в таблицу SERVERS
+                cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
+                #conn.commit()
+                server_id = cursor.lastrowid
+                cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server_id, user, hashed_password))
+                default_user_id = cursor.lastrowid
+                cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, gefault_user, ip_addr, port) \
+                                VALUES (?, ?, ?, ?)", (server_id, default_user_id, adress, port))
+                cursor.execute("UPDATE SERVERS SET default_connect = ? WHERE svc_id = ?", (cursor.lastrowid, server_id))
+            else:
+                cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, ip_addr, port) VALUES (?, ?, ?)", (server_id, adress, port))
+            # вывод информации о том, что сервер добавлен
+            self.notification.configure(text="Сервер добавлен", text_color=("#FF8C00"))
+
+    
     def test_conf(self):
-        #test_window = ctk.CTk()
-        #test_window.geometry("400x300")
-
-
-        #def button_click_event():
-        #    dialog = ctk.CTkInputDialog(text="Type in a number:", title="Test")
-        #    print("Number:", dialog.get_input())
-
-
-        #button = ctk.CTkButton(app, text="Open Dialog", command=button_click_event)
-        #button.pack(padx=20, pady=20)
-
-        #app.mainloop()
-
-
-        print("test")
+        test_name = self.alias_svc.get()
         test_adress = self.ip_adress.get()
         test_port = self.port.get()
         test_user = self.user.get()
         test_user_pass = self.password.get()
-        
+        if not test_name:
+                test_name = test_adress
+        if not test_port:
+                test_port = 22
+        if not test_adress:
+            self.notification.configure(text="Не указан IP-адрес!",
+                                    text_color=("#FF8C00"))
+            return        
+        if int(test_port) > 65536:
+            self.notification.configure(text="Невалидное значение порта!",
+                                    text_color=("#FF8C00"))
+            return
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(hostname=test_adress, username=test_user, password=test_user_pass, port=test_port)
-        stdin, stdout, stderr = client.exec_command('ls')
-        print(stdout.read().decode())
+        client.connect(hostname=test_adress,
+                       username=test_user,
+                       password=test_user_pass,
+                       port=test_port
+                       )
+        stdin, stdout, stderr = client.exec_command('uname -a')
+        data = stdout.read().decode()
+        print(data)
         client.close()
-
+        test_window = ctk.CTkToplevel()
+        test_window.title(test_name)
+        test_window.geometry("400x150")
+        label = ctk.CTkLabel(test_window, text=data)
+        label.grid(row=0, padx=20, pady=20)
+        test_window.after(100, test_window.lift)
+        
     #Функция выхода из окна
     def cancel(self):
         self.destroy()

@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import scrollableLabelButtonFrame as sc
-import addprofile
 import os
 from PIL import Image
 import button 
@@ -9,19 +8,16 @@ import menuBar
 import globaldata
 import widgets
 import sqlite3
-#import threading
-
+from tabs import CTkTabview as tab
+from buttonFrame import ButtonFrame
 
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         #настройки основного окна
-        #self.conn = sqlite3.connect('Charlotte')
-        #self.cursor = self.conn.cursor()
         self.title("Charlotte v0.01")
         self.geometry(f"{1100}x{580}")
-        
         # configure grid layout (4x4)
         self.grid_columnconfigure(1,
                                   weight=1)
@@ -29,7 +25,6 @@ class App(ctk.CTk):
                                   weight=0)
         self.grid_rowconfigure((1, 2),
                                weight=1)
-
 
         #верхнее меню
         self.optionmenu = mainMenu.OptionMenuHolder(self)
@@ -68,79 +63,33 @@ class App(ctk.CTk):
                              sticky="w")
         #======================================================================================
         #сайдбар с кнопками 
-        self.button_frame = ctk.CTkFrame(self.sidebar_frame,
-                                         corner_radius=4,
-                                         border_width=1, #ширина рамки
-                                         fg_color="transparent" #цвет фона
-                                         )
+        self.button_frame = ButtonFrame(master=self.sidebar_frame)
         self.button_frame.grid(row=1,
                                column=0,
                                columnspan=2,
                                pady=(0, 2),
                                padx=1,
                                sticky="nsew")
-        self.button_1 = button.LittleAcessButton(self.button_frame,
-                                                 text="+",
-                                                 command=self.open_input_dialog_event)
-        self.button_1.grid(row=0,
-                           column=0)
-
-        self.button_2 = button.LittleAcessButton(self.button_frame,
-                                                 text="+c",
-                                                 command=self.open_input_dialog_event)
-        self.button_2.grid(row=0,
-                           column=1)
-
-        self.button_3 = button.LittleAcessButton(self.button_frame,
-                                                 text="g",
-                                                 command=self.open_input_dialog_event)
-        self.button_3.grid(row=0,
-                           column=2)
-
-        self.button_3 = button.LittleOwnButton(self.button_frame,
-                                               text="?")
-        self.button_3.grid(row=0,
-                           column=3)
-        self.button_4 = button.LittleAcessButton(self.button_frame,
-                                               text="@",
-                                               command=self.open_input_dialog_event)
-        self.button_4.grid(row=0,
-                           column=4)
         #=====================================================================================
-        #Меню с подключениями
         self.scrollable_label_button_frame = sc.ScrollableLabelButtonFrame(self.sidebar_frame, 
-                                                                           command=self.label_button_frame_event,
-                                                                           corner_radius=0,
-                                                                           scrollbar_button_hover_color=("#5A5757"),
-                                                                           #fg_color="transparent",
-                                                                           border_width=1, #ширина рамки
-                                                                           )
-        self.scrollable_label_button_frame.grid(row=4,
-                                                column=0,
-                                                pady=0,
-                                                padx=(0, 0),
-                                                columnspan=2,
-                                                sticky="nsew")
+                                                                   corner_radius=0, 
+                                                                   scrollbar_button_hover_color=("#5A5757"),
+                                                                   border_width=1)
+        self.scrollable_label_button_frame.grid(row=4, column=0, pady=0, padx=(0, 0), columnspan=2, sticky="nsew")
+        
+        with sqlite3.connect('Charlotte') as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT desc_svc, svc_id FROM SERVERS WHERE account_id = ?", (globaldata.global_id,))
+            server_data = cursor.fetchall()
+            
+        for desc_name, srv_id in server_data:
+            #print(desc_name)
+            #print(srv_id)
+            self.scrollable_label_button_frame.add_item(desc_name,
+                                                        srv_id=srv_id,
+                                                        image=ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "conn.png")))
+                                                        )
 
-        
-        
-        self.conn = sqlite3.connect('Charlotte')
-        self.cursor = self.conn.cursor()
-        self.cursor.execute("SELECT desc_svc FROM SERVERS WHERE account_id = ?", (globaldata.global_id,))
-        desc_name = self.cursor.fetchall()
-        self.cursor.execute("SELECT default_connect FROM SERVERS")
-        def_conn_name = self.cursor.fetchall()
-        
-        for i, desc_name in enumerate(desc_name):  # цикл для добалвения профилей серверов
-            self.scrollable_label_button_frame.add_item(desc_name[0],
-                                                        def_conn_name[0],
-                                                        image=ctk.CTkImage(Image.open(os.path.join(current_dir,
-                                                                                                             "img",
-                                                                                                             "conn.png")))
-                                                                      )
-        
-        self.conn.commit()
-        self.conn.close()
         # Создаем отдельный поток для обновления записей
         #self.update_thread = threading.Thread(target=self.update_records)
         #self.update_thread.start()
@@ -160,7 +109,6 @@ class App(ctk.CTk):
                                               padx=(10, 2),
                                               pady=(0, 10))
         self.appearance_mode_optionemenu.set("Dark")
-        
 
         self.scaling_label = ctk.CTkLabel(self.sidebar_frame,
                                                     text="Масштаб:"
@@ -186,83 +134,61 @@ class App(ctk.CTk):
         self.entry.grid(row=4,
                         column=1,
                         columnspan=2,
-                        padx=(10, 0),
+                        padx=(5, 0),
                         pady=(5, 10),
                         sticky="nsew")
 
         self.main_button_1 = button.AcessButton(self,
                                              text="Поиск",
-                                             command=self.open_input_dialog_event)
+                                             command=self.search)
         self.main_button_1.grid(row=4, 
                                 column=3,
-                                padx=(10, 10),
+                                padx=(5, 5),
                                 pady=(5, 10),
                                 sticky="nsew")
         #=========================================================================================
-        # create textbox
-        self.textbox = ctk.CTkTextbox(self,
-                                                width=250,
-                                                corner_radius=3)
-        self.textbox.insert("0.0",
-                            "Оповещения:\n\n" + "Подозрительные изменения в акнутом алерте Сервер: uz-ceir-geo-app2 Алерт: face-id-proxy-service_proc PROCS CRITICAL: 0 processes with args '/opt/svyazcom/bin/face-id-proxy-service' check_stat_ussd_out WARNING! Count of USSD_OUT_FULL_ALL is low or high (8 instead 30) in last 1 hours!\n\n" * 20)
-        self.textbox.grid(row=1,
-                          column=2,
-                          padx=(10, 0),
-                          pady=(10, 0),
-                          sticky="nsew")
-        #=========================================================================================
         # create tabview
-        self.tabview = ctk.CTkTabview(self,
-                                                width=250,
-                                                corner_radius=3)
+        self.tabview = tab(self)
         self.tabview.grid(row=1,
                           column=1,
                           rowspan=2,
-                          padx=(10, 0),
+                          columnspan=3,
+                          padx=(5, 5),
                           pady=(0, 0),
                           sticky="nsew")
         self.tabview.add("Общие показатели")
         self.tabview.add("Tab 2")
         self.tabview.add("Tab 3")
         self.tabview.tab("Общие показатели").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
+        self.tabview.tab("Общие показатели").grid_rowconfigure((0, 1),weight=1)
         self.tabview.tab("Tab 2").grid_columnconfigure(0, weight=1)
-
-        self.optionmenu_1 = ctk.CTkOptionMenu(self.tabview.tab("Общие показатели"),
-                                                        dynamic_resizing=False,
-                                                        values=["Value 1", "Value 2", "Value Long Long Long"],
-                                                        corner_radius=3)
-        self.optionmenu_1.grid(row=0,
+        #=========================================================================================
+        # create textbox
+        self.metrix_frame = ctk.CTkFrame(self.tabview.tab("Общие показатели"))
+        self.metrix_frame.grid(row=0,
                                column=0,
-                               padx=10,
-                               pady=(10, 10))
-        self.combobox_1 = ctk.CTkComboBox(self.tabview.tab("Общие показатели"),
-                                                    values=["Value 1", "Value 2", "Value Long....."],
-                                                    corner_radius=3)
-        self.combobox_1.grid(row=1,
-                            column=0,
-                            padx=10,
-                            pady=(5, 5))
-        self.string_input_button = ctk.CTkButton(self.tabview.tab("Общие показатели"),
-                                                           text="Open CTkInputDialog",
-                                                           command=self.open_input_dialog_event,
-                                                           corner_radius=3)
-        self.string_input_button.grid(row=2,
-                                      column=0,
-                                      padx=10,
-                                      pady=(5, 5))
-        self.label_tab_2 = ctk.CTkLabel(self.tabview.tab("Tab 2"),
-                                                  text="CTkLabel on Tab 2")
-        self.label_tab_2.grid(row=0,
-                              column=0,
-                              padx=10,
-                              pady=10)
+                               rowspan=3,
+                               padx=(5, 0),
+                               pady=(0, 5),
+                               sticky="nsew")
+
+        self.textbox = ctk.CTkTextbox(self.tabview.tab("Общие показатели"),
+                                                width=250,
+                                                corner_radius=3)
+        self.textbox.insert("0.0",
+                            "Оповещения:\n\n" + "Подозрительные изменения в акнутом алерте Сервер: uz-ceir-geo-app2 Алерт: face-id-proxy-service_proc PROCS CRITICAL: 0 processes with args '/opt/svyazcom/bin/face-id-proxy-service' check_stat_ussd_out WARNING! Count of USSD_OUT_FULL_ALL is low or high (8 instead 30) in last 1 hours!\n\n" * 20)
+        self.textbox.grid(row=0,
+                          column=1,
+                          padx=(5, 0),
+                          pady=(0, 0),
+                          sticky="nsew")
 
         # create radiobutton frame
-        self.radiobutton_frame = ctk.CTkFrame(self)
-        self.radiobutton_frame.grid(row=1,
-                                    column=3,
-                                    padx=(10, 10),
-                                    pady=(10, 0),
+        self.radiobutton_frame = ctk.CTkFrame(self.tabview.tab("Общие показатели"))
+        self.radiobutton_frame.grid(row=0,
+                                    column=2,
+                                    padx=(5, 5),
+                                    pady=(0, 0),
                                     sticky="nsew")
 
         self.radio_var = ctk.IntVar(value=0)
@@ -302,33 +228,15 @@ class App(ctk.CTk):
                                  padx=20,
                                  sticky="n")
 
-        # create slider and progressbar frame
-        #self.slider_progressbar_frame = customtkinter.CTkFrame(self, fg_color="transparent")
-        #self.slider_progressbar_frame.grid(row=2, column=1, rowspan=2, padx=(10, 0), pady=(10, 0), sticky="nsew")
-        #self.slider_progressbar_frame.grid_columnconfigure(0, weight=1)
-        #self.slider_progressbar_frame.grid_rowconfigure(4, weight=1)
-        #self.seg_button_1 = customtkinter.CTkSegmentedButton(self.slider_progressbar_frame, corner_radius=3)
-        #self.seg_button_1.grid(row=0, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        #self.progressbar_1 = customtkinter.CTkProgressBar(self.slider_progressbar_frame, corner_radius=3)
-        #self.progressbar_1.grid(row=1, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        #self.progressbar_2 = customtkinter.CTkProgressBar(self.slider_progressbar_frame, corner_radius=3)
-        #self.progressbar_2.grid(row=2, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        #self.slider_1 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=1, number_of_steps=4)
-        #self.slider_1.grid(row=3, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        #self.slider_2 = customtkinter.CTkSlider(self.slider_progressbar_frame, orientation="vertical", corner_radius=3)
-        #self.slider_2.grid(row=0, column=1, rowspan=5, padx=(10, 10), pady=(10, 10), sticky="ns")
-        #self.progressbar_3 = customtkinter.CTkProgressBar(self.slider_progressbar_frame, orientation="vertical", corner_radius=3)
-        #self.progressbar_3.grid(row=0, column=2, rowspan=5, padx=(10, 20), pady=(10, 10), sticky="ns")
-
         # create scrollable frame
-        self.scrollable_frame = ctk.CTkScrollableFrame(self,
+        self.scrollable_frame = ctk.CTkScrollableFrame(self.tabview.tab("Общие показатели"),
                                                                  label_text="Метрики",
                                                                  corner_radius=3)
-        self.scrollable_frame.grid(row=2,
-                                   column=2,
+        self.scrollable_frame.grid(row=1,
+                                   column=1,
                                    rowspan=2,
-                                   padx=(10, 0),
-                                   pady=(10, 0),
+                                   padx=(5, 0),
+                                   pady=(5, 5),
                                    sticky="nsew")
         self.scrollable_frame.grid_columnconfigure(0,
                                                    weight=1)
@@ -342,14 +250,16 @@ class App(ctk.CTk):
                         padx=10,
                         pady=(0, 10))
             self.scrollable_frame_switches.append(switch)
+        #===================================================================================
+
 
         # create checkbox and switch frame
-        self.checkbox_slider_frame = ctk.CTkFrame(self)
-        self.checkbox_slider_frame.grid(row=2,
-                                        column=3,
+        self.checkbox_slider_frame = ctk.CTkFrame(self.tabview.tab("Общие показатели"))
+        self.checkbox_slider_frame.grid(row=1,
+                                        column=2,
                                         rowspan=2,
-                                        padx=(10, 10),
-                                        pady=(10, 0),
+                                        padx=(5, 5),
+                                        pady=(5, 5),
                                         sticky="nsew")
         self.checkbox_1 = ctk.CTkCheckBox(self.checkbox_slider_frame,
                                                     corner_radius=3)
@@ -372,41 +282,30 @@ class App(ctk.CTk):
                              pady=20,
                              padx=20,
                              sticky="n")
+        #====================================================================
 
         # set default values
-        #self.sidebar_button_3.configure(state="disabled")
         self.checkbox_3.configure(state="disabled")
         self.checkbox_1.select()
         self.scrollable_frame_switches[0].select()
         self.scrollable_frame_switches[4].select()
         self.radio_button_3.configure(state="disabled")
-        self.optionmenu_1.set("CTkOptionmenu")
-        self.combobox_1.set("CTkComboBox")
-        #self.slider_1.configure(command=self.progressbar_2.set)
-        #self.slider_2.configure(command=self.progressbar_3.set)
-        #self.progressbar_1.configure(mode="indeterminnate")
-        #self.progressbar_1.start()
-        #self.seg_button_1.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
-        #self.seg_button_1.set("Value 2")
         self.toplevel_window = None
-
+        #======================================================================
+        #======================================================================
 
 
     #def update_records(self):
     #    conn = sqlite3.connect('Charlotte')
     #    cursor = conn.cursor()
-
     #    while True:
             # Выполняем запрос SELECT
     #        cursor.execute("SELECT desc_svc FROM SERVERS")
     #        results = cursor.fetchall()
-
             # Обновляем интерфейс в главном потоке
     #        self.after(1000, self.update_interface, results)
-
             # Задержка перед следующей проверкой
             #time.sleep(1)  # Настройте нужное вам время задержки
-
     #    cursor.close()
     #    conn.close()
 
@@ -423,15 +322,6 @@ class App(ctk.CTk):
     #                                                                  )
 
 
-
-
-    def open_input_dialog_event(self):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = addprofile.ToplevelWindow(self)  # create window if its None or destroyed
-        else:
-            self.toplevel_window.focus()  # if window exists focus it
-        self.toplevel_window.after(100, self.toplevel_window.lift)
-
     def change_appearance_mode_event(self, new_appearance_mode: str):
         ctk.set_appearance_mode(new_appearance_mode)
 
@@ -442,8 +332,6 @@ class App(ctk.CTk):
     def sidebar_button_event(self):
         print("sidebar_button click")
 
-    def label_button_frame_event(self, item):
-        print(f"label button frame clicked: {item}")
 
     def search(self):
         print("search_button click")
