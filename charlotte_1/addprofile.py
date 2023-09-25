@@ -12,7 +12,6 @@ import paramiko
 class ToplevelWindow(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #self.geometry("500x400")
         self.title("Добавить профиль")
         current_dir = os.path.dirname(os.path.abspath(__file__))
         self.logo_reg = ctk.CTkImage(Image.open(os.path.join(current_dir, 

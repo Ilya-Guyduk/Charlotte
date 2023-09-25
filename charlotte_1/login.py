@@ -243,23 +243,31 @@ class loginWindow(ctk.CTk):
             pickle.dump(credentials, file)
 
     def log_entry(self):
+        self.conn = sqlite3.connect('Charlotte')
+        self.cursor = self.conn.cursor()  
+
         login = self.login_entry.get()
-        password = self.login_password_entry.get()
-        checkbox_state = self.enabled.get()
+        password = self.login_password_entry.get()      
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        with sqlite3.connect('Charlotte') as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT account_id FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password))
-            result = cursor.fetchone()
-            if result:
-                globaldata.global_id = int(result[0]) #переменная с user_id для формирования информации
-                #if checkbox_state == self.enabled_on:
-                #    save_credentials(login, password)
-                self.destroy()
-                app = test.App()
-                app.mainloop()  
-            else:
-                self.login_notification.configure(text="Неверные данные для входа!", text_color=("#FF8C00"))
+
+        self.cursor.execute("SELECT * FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password))
+        self.result = self.cursor.fetchone()        
+        
+        if self.result:
+            
+            
+        
+            globaldata.global_id = int(self.cursor.execute("SELECT account_id FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0])
+           
+            self.conn.commit()
+            self.conn.close()#закрываем соединение с базой данных
+            print(globaldata.global_id)
+            self.destroy()  # Закройте окно входа
+            app = test.App()  # Создайте экземпляр класса основного окна
+            app.mainloop()  # Запустите основное окно приложения
+        else:
+            self.login_notification.configure(text="Не верные данные для входа!",
+                                    text_color=("#FF8C00"))
     
     def registration(self):
         login = self.reg_entry.get()
