@@ -6,11 +6,9 @@ class ButtonFrame(ctk.CTkFrame):
 	def __init__(self, master, **kwargs):
 		super().__init__(master,
                        corner_radius=4,
-                       border_width=1, #ширина рамки
+                       border_width=0, #ширина рамки
                        fg_color="transparent", #цвет фона
-                       **kwargs
-                                        )
-
+                       **kwargs)
 		self.button_1 = button.LittleAcessButton(self,
 	                                                 text="+",
 	                                                 command=self.open_input_dialog_event)

@@ -208,7 +208,7 @@ class loginWindow(ctk.CTk):
 
         self.login_button = button.AcessButton(self.reg_button_frame,
                                                 text="Создать",
-                                                command=self.log_entry)
+                                                command=self.registration)
         self.login_button.grid(row=0,
                                column=0,
                                pady=(6, 6),
@@ -243,47 +243,50 @@ class loginWindow(ctk.CTk):
             pickle.dump(credentials, file)
 
     def log_entry(self):
-        self.conn = sqlite3.connect('Charlotte')
-        self.cursor = self.conn.cursor()  
-
-        login = self.login_entry.get()
-        password = self.login_password_entry.get()      
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
-        self.cursor.execute("SELECT * FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password))
-        self.result = self.cursor.fetchone()        
-        
-        if self.result:
-            
-            
-        
-            globaldata.global_id = int(self.cursor.execute("SELECT account_id FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0])
-           
-            self.conn.commit()
-            self.conn.close()#закрываем соединение с базой данных
-            print(globaldata.global_id)
-            self.destroy()  # Закройте окно входа
-            app = test.App()  # Создайте экземпляр класса основного окна
-            app.mainloop()  # Запустите основное окно приложения
-        else:
-            self.login_notification.configure(text="Не верные данные для входа!",
+      """функция входа в основное окно приложения"""
+      self.conn = sqlite3.connect('Charlotte')
+      self.cursor = self.conn.cursor()  
+      login = self.login_entry.get()
+      password = self.login_password_entry.get()      
+      hashed_password = hashlib.sha256(password.encode()).hexdigest()
+      if not login and not password:
+        self.login_notification.configure(text="Укажите данные для входа!",
+                                    text_color=("#FF8C00"))
+        return
+      self.cursor.execute("SELECT * FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password))
+      self.result = self.cursor.fetchone()        
+      if self.result:
+        globaldata.global_id = int(self.cursor.execute("SELECT account_id FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password)).fetchone()[0])
+        self.conn.commit()
+        self.conn.close()#закрываем соединение с базой данных
+        print(globaldata.global_id)
+        self.destroy()  # Закройте окно входа
+        app = test.App()  # Создайте экземпляр класса основного окна
+        app.mainloop()  # Запустите основное окно приложения
+      else:
+        self.login_notification.configure(text="Не верный логин или пароль!",
                                     text_color=("#FF8C00"))
     
     def registration(self):
+        self.conn = sqlite3.connect('Charlotte')
+        self.cursor = self.conn.cursor() 
         login = self.reg_entry.get()
         password = self.password_entry.get()
         password_retry = self.password_entry_retry.get()
-        if not login:
-            self.login_notification.configure(text="Укажите логин!",
+        if not login and not password:
+            self.reg_notification.configure(text="Укажите данные для регистрации!",
+                                    text_color=("#FF8C00"))
+        elif not login:
+            self.reg_notification.configure(text="Укажите логин!",
                                     text_color=("#FF8C00"))
         elif not password:
-            self.login_notification.configure(text="Укажите пароль!",
+            self.reg_notification.configure(text="Укажите пароль!",
                                     text_color=("#FF8C00"))
         elif password != password_retry:
-            self.login_notification.configure(text="Пароли не совпадают!",
+            self.reg_notification.configure(text="Пароли не совпадают!",
                                     text_color=("#FF8C00"))
         else:    
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            hashed_password = hashlib.sha256(password.code()).hexdigest()
             with sqlite3.connect('Charlotte') as conn:
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO ACCOUNTS (login, password) VALUES (?, ?)", (login, hashed_password))

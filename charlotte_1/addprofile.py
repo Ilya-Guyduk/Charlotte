@@ -72,6 +72,14 @@ class ToplevelWindow(ctk.CTkToplevel):
                         padx=(10, 10),
                         pady=(10, 10),
                         sticky="nsew")
+        self.add_ip = button.LittleOwnButton(self.tabview.tab("Сервер"),
+                                              text="+",
+                                              command=self.add_entry)
+        self.add_ip.grid(row=1,
+                                column=2,
+                                padx=(10, 10),
+                                pady=(10, 10),
+                                sticky="nsew")
 
         self.user = ctk.CTkEntry(self.tabview.tab("Сервер"), 
                                            placeholder_text="Пользователь",
@@ -116,7 +124,7 @@ class ToplevelWindow(ctk.CTkToplevel):
                                columnspan=2)
         #==================================================================
 
-        #Фрейм окна с кнопками
+        #Фрейм окна с кнопками  
         self.button_frame = ctk.CTkFrame(self,
                                          corner_radius=0,
                                          border_width=1)
@@ -141,7 +149,7 @@ class ToplevelWindow(ctk.CTkToplevel):
                                 sticky="nsew")
 
         self.main_button_3 = button.OwnButton(self.button_frame,
-                                              text="Соединение",
+                                              text="Тест",
                                                 command=self.test_conf)
         self.main_button_3.grid(row=0,
                                 column=3,
@@ -178,7 +186,7 @@ class ToplevelWindow(ctk.CTkToplevel):
             port = self.port.get() or 22
             user = self.user.get()
             user_pass = self.password.get()
-            hashed_password = hashlib.sha256(user_pass.encode()).hexdigest() if user_pass else None
+            #hashed_password = hashlib.sha256(user_pass.encode()).hexdigest() if user_pass else None
             # валидация IP-адреса и порта
             if not adress:
                 self.notification.configure(text="Не указан IP-адрес!", text_color=("#FF8C00"))
@@ -187,12 +195,12 @@ class ToplevelWindow(ctk.CTkToplevel):
                 self.notification.configure(text="Невалидное значение порта!", text_color=("#FF8C00"))
                 return
             # вставка данных в таблицу SVC_USERS, SVC_CONNECTS и обновление SERVERS
-            if user and hashed_password:
+            if user and user_pass:
                 # вставка данных в таблицу SERVERS
                 cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
                 #conn.commit()
                 server_id = cursor.lastrowid
-                cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server_id, user, hashed_password))
+                cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server_id, user, user_pass))
                 default_user_id = cursor.lastrowid
                 cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, gefault_user, ip_addr, port) \
                                 VALUES (?, ?, ?, ?)", (server_id, default_user_id, adress, port))
@@ -228,13 +236,13 @@ class ToplevelWindow(ctk.CTkToplevel):
                        password=test_user_pass,
                        port=test_port
                        )
-        stdin, stdout, stderr = client.exec_command('uname -a')
+        stdin, stdout, stderr = client.exec_command('hostname')
         data = stdout.read().decode()
         print(data)
         client.close()
         test_window = ctk.CTkToplevel()
         test_window.title(test_name)
-        test_window.geometry("400x150")
+        #test_window.geometry("400x150")
         label = ctk.CTkLabel(test_window, text=data)
         label.grid(row=0, padx=20, pady=20)
         test_window.after(100, test_window.lift)

@@ -1,8 +1,9 @@
 import customtkinter as ctk
-
-
-class RegTab():
-	def __init__(self, *args, **kwargs):
+import sqlite3
+import button 
+class RegTab(ctk.CTkFrame):
+	def __init__(self, master, **kwargs):
+		super().__init__(master, **kwargs)
 		self.reg_entry = ctk.CTkEntry(self,
 	                                            placeholder_text="Логин",
 	                                            corner_radius=3)
@@ -22,7 +23,7 @@ class RegTab():
 	                                 )
 		self.password_entry.bind('<Key>', self.on_reg_entry_change)
 
-		self.password_entry_retry = ctk.CTkEntry(self.reg_window.tab("Регистрация"),
+		self.password_entry_retry = ctk.CTkEntry(self,
 	                                            placeholder_text="Повторите пароль",
 	                                            show="*",
 	                                            corner_radius=3)
@@ -36,7 +37,7 @@ class RegTab():
 		self.enabled_off = "Сохранить пользователя"
 		self.enabled = ctk.StringVar(value=self.enabled_off)
 
-		self.checkbutton = ctk.CTkCheckBox(self.reg_window.tab("Регистрация"),
+		self.checkbutton = ctk.CTkCheckBox(self,
 	                                           textvariable=self.enabled,
 	                                           variable=self.enabled, 
 	                                           offvalue=self.enabled_off,
@@ -53,13 +54,13 @@ class RegTab():
 	                              )
 		self.checkbutton.configure(state="disabled")
 	    
-		self.reg_window.grid(row=1,
-	                             padx=5,
-	                             pady=(0, 5),
-	                             column=0,
-	                             sticky="nsew")
+		#self.reg_window.grid(row=1,
+	    #                         padx=5,
+	    #                         pady=(0, 5),
+	    #                         column=0,
+	    #                         sticky="nsew")
 	        #окно уведомлений
-		self.reg_notification = ctk.CTkLabel(self.reg_window.tab("Регистрация"),
+		self.reg_notification = ctk.CTkLabel(self,
 	                                                    text="",
 	                                                    font=ctk.CTkFont(family="Courier new")
 	                                                    )
@@ -73,7 +74,7 @@ class RegTab():
 
 
 	     #Фрейм окна с кнопками регистрации
-		self.reg_button_frame = ctk.CTkFrame(self.reg_window.tab("Регистрация"),
+		self.reg_button_frame = ctk.CTkFrame(self,
 	                                         corner_radius=0,
 	                                         border_width=1)
 		self.reg_button_frame.grid(row=7,
@@ -83,7 +84,7 @@ class RegTab():
 
 		self.login_button = button.AcessButton(self.reg_button_frame,
 	                                                text="Создать",
-	                                                command=self.log_entry)
+	                                                command=self.registration)
 		self.login_button.grid(row=0,
 	                               column=0,
 	                               pady=(6, 6),
@@ -100,25 +101,36 @@ class RegTab():
 	                                sticky="nsew")
 
 
-	def log_entry(self):
-		login = self.login_entry.get()
-		password = self.login_password_entry.get()
-		checkbox_state = self.enabled.get()
-		hashed_password = hashlib.sha256(password.encode()).hexdigest()
-		with sqlite3.connect('Charlotte') as conn:
-			cursor = conn.cursor()
-			cursor.execute("SELECT account_id FROM ACCOUNTS WHERE login = ? AND password = ?", (login, hashed_password))
-			result = cursor.fetchone()
-			if result:
-				globaldata.global_id = int(result[0]) #переменная с user_id для формирования информации
-				#if checkbox_state == self.enabled_on:
-                #    save_credentials(login, password)
-				self.destroy()
-				app = test.App()
-				app.mainloop()  
-			else:
-				self.login_notification.configure(text="Неверные данные для входа!", text_color=("#FF8C00"))
+	def registration(self):
+		self.conn = sqlite3.connect('Charlotte')
+		self.cursor = self.conn.cursor() 
+		login = self.reg_entry.get()
+		password = self.password_entry.get()
+		password_retry = self.password_entry_retry.get()
+		if not login and not password:
+			self.reg_notification.configure(text="Укажите данные для регистрации!",
+                                    text_color=("#FF8C00"))
+		elif not login:
+			self.reg_notification.configure(text="Укажите логин!",
+                                    text_color=("#FF8C00"))
+		elif not password:
+			self.reg_notification.configure(text="Укажите пароль!",
+                                    text_color=("#FF8C00"))
+		elif password != password_retry:
+			self.reg_notification.configure(text="Пароли не совпадают!",
+                                    text_color=("#FF8C00"))
+		else:    
+			hashed_password = hashlib.sha256(password.decode()).hexdigest()
+			with sqlite3.connect('Charlotte') as conn:
+				cursor = conn.cursor()
+				cursor.execute("INSERT INTO ACCOUNTS (login, password) VALUES (?, ?)", (login, hashed_password))
+				self.result = cursor.fetchone()        
+				self.reg_notification.configure(text="Пользователь добавлен!",
+                                        text_color=("#FF8C00"))
 
+	#функция закрытия окна по нажатию на кнопку "cancel"
+	def cancel(self):
+		self.destroy()
 
 	def on_reg_entry_change(self, event):
 		# Проверка, заполнены ли поля
