@@ -177,7 +177,7 @@ class ToplevelWindow(ctk.CTkToplevel):
 
 
     def add_profile(self):
-    # подключаемся к базе данных
+    """подключаемся к базе данных"""
         with sqlite3.connect('Charlotte') as conn:
             cursor = conn.cursor()
             # получение значений полей ввода
@@ -198,7 +198,6 @@ class ToplevelWindow(ctk.CTkToplevel):
             if user and user_pass:
                 # вставка данных в таблицу SERVERS
                 cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
-                #conn.commit()
                 server_id = cursor.lastrowid
                 cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server_id, user, user_pass))
                 default_user_id = cursor.lastrowid
@@ -247,6 +246,7 @@ class ToplevelWindow(ctk.CTkToplevel):
         label.grid(row=0, padx=20, pady=20)
         test_window.after(100, test_window.lift)
         
-    #Функция выхода из окна
+    
     def cancel(self):
+    """Функция выхода из окна"""
         self.destroy()
