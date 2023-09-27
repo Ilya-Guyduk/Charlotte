@@ -17,34 +17,24 @@ class ServerWindow(ctk.CTkToplevel):
         self.svc_id = svc_id
         with sqlite3.connect('Charlotte') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT desc_svc FROM SERVERS WHERE account_id = ? AND svc_id = ?", (globaldata.global_id, self.svc_id))
-            server_name = cursor.fetchone()[0]
-
-            cursor.execute("SELECT ip_addr FROM SVC_CONNECTS WHERE svc_id = ?", (self.svc_id,))
-            ip_addr = cursor.fetchone()[0]
+            cursor.execute("SELECT desc_svc, ip_addr, port, svc_login, svc_pass, hostname, os, architecture, kernel, machine_id, boot_id FROM SERVERS \
+                            JOIN SVC_CONNECTS USING (svc_id) \
+                            JOIN SVC_USERS USING (svc_id) \
+                            JOIN SVC_MAIN USING (svc_id) \
+                            WHERE account_id = ? AND svc_id = ?", (globaldata.global_id, self.svc_id))
+            serverdata = cursor.fetchone()
+            server_name = serverdata[0]
+            ip_addr = serverdata[1]
+            port = serverdata[2]
+            svc_login = serverdata[3]
+            svc_pass = serverdata[4]
+            svc_hostname = serverdata[5]
+            svc_os = serverdata[6]
+            svc_arch = serverdata[7]
+            svc_kernel = serverdata[8]
+            svc_machine_id = serverdata[9]
+            svc_boot_id = serverdata[10]
             
-            cursor.execute("SELECT port FROM SVC_CONNECTS WHERE svc_id = ?", (self.svc_id,))
-            port = cursor.fetchone()[0]
-            
-            cursor.execute("SELECT svc_login FROM SVC_USERS WHERE svc_id = ?", (self.svc_id,))
-            svc_login = cursor.fetchone()[0]
-           
-            cursor.execute("SELECT svc_pass FROM SVC_USERS WHERE svc_id = ?", (self.svc_id,))
-            svc_pass = cursor.fetchone()[0]
-
-            cursor.execute("SELECT hostname FROM SVC_MAIN WHERE svc_id = ?", (self.svc_id,))
-            svc_hostname = cursor.fetchone()[0]
-
-            cursor.execute("SELECT os FROM SVC_MAIN WHERE svc_id = ?", (self.svc_id,))
-            svc_os = cursor.fetchone()[0]
-
-            cursor.execute("SELECT architecture FROM SVC_MAIN WHERE svc_id = ?", (self.svc_id,))
-            svc_arch = cursor.fetchone()[0]
-
-            cursor.execute("SELECT kernel FROM SVC_MAIN WHERE svc_id = ?", (self.svc_id,))
-            svc_kernel = cursor.fetchone()[0]
-            
-
         self.title(server_name)
         self.grid_rowconfigure(0, weight=0)
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -113,6 +103,22 @@ class ServerWindow(ctk.CTkToplevel):
                                                     anchor="e"
                                                     )
         self.arch_label.grid(row=4,
+                             column=0)
+
+        self.machine_id_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text=f"Machine ID: {svc_machine_id}",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
+                                                    )
+        self.machine_id_label.grid(row=5,
+                             column=0)
+
+        self.boot_id_label = ctk.CTkLabel(self.tabview.tab("Описание"),
+                                                    text=f"Boot ID: {svc_boot_id}",
+                                                    text_color=("#5A5757"),
+                                                    anchor="e"
+                                                    )
+        self.boot_id_label.grid(row=6,
                              column=0)
 
         #===================================================================
@@ -296,54 +302,7 @@ class ServerWindow(ctk.CTkToplevel):
                 cursor.execute("INSERT INTO SVC_ADDR (svc_id, ip_addr, interface) VALUES (?, ?, ?)", (self.svc_id, ip_addresses[i], interfaces[i]))
 
     def add_main_data(self):
-        with sqlite3.connect('Charlotte') as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT ip_addr FROM SVC_CONNECTS WHERE svc_id = ?", (self.svc_id,))
-            ip_addr = cursor.fetchone()[0]
-            print(ip_addr)
-            cursor.execute("SELECT port FROM SVC_CONNECTS WHERE svc_id = ?", (self.svc_id,))
-            port = cursor.fetchone()[0]
-            print(port)
-            cursor.execute("SELECT svc_login FROM SVC_USERS WHERE svc_id = ?", (self.svc_id,))
-            svc_login = cursor.fetchone()[0]
-            print(svc_login)
-            cursor.execute("SELECT svc_pass FROM SVC_USERS WHERE svc_id = ?", (self.svc_id,))
-            svc_pass = cursor.fetchone()[0]
-            print(svc_pass)
-
-
-            client = paramiko.SSHClient()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(hostname=ip_addr,
-                           username=svc_login,
-                               password=svc_pass,
-                               port=port
-                               )
-            stdin, stdout, stderr = client.exec_command('hostnamectl')
-            output = stdout.read().decode()
-
-            # Распарсиваем вывод команды
-            parsed_data = {}
-            for line in output.split('\n'):
-                if ': ' in line:
-                    key, value = line.split(': ')
-                    print(key, value)
-                    parsed_data[key.rstrip()] = value.lstrip()
-                    
-            print(parsed_data)
-
-            # Вставляем данные в таблицу
-            cursor.execute('''
-                INSERT INTO svc_main (svc_id, hostname, chassis, machine_id, boot_id, os, kernel, architecture)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''',(self.svc_id,
-                parsed_data.get('   Static hostname', ''),
-                parsed_data.get('           Chassis', ''),
-                parsed_data.get('        Machine ID', ''),
-                parsed_data.get('           Boot ID', ''),
-                parsed_data.get('  Operating System', ''),
-                parsed_data.get('            Kernel', ''),
-                parsed_data.get('      Architecture', '')))
+        pass
 
        
     #Функция выхода из окна

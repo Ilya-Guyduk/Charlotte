@@ -8,6 +8,8 @@ import os
 import time
 import globaldata
 import paramiko
+import ssh_parser_module
+import threading
 
 class ToplevelWindow(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -37,8 +39,6 @@ class ToplevelWindow(ctk.CTkToplevel):
                           sticky="nsew")
         self.tabview.add("Сервер")
         self.tabview.add("Кластер")
-        #self.tabview.tab("Сервер").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
-        #self.tabview.tab("Кластер").grid_columnconfigure(0, weight=1)
 
         self.alias_svc = ctk.CTkEntry(self.tabview.tab("Сервер"),
                                             placeholder_text="Название(не обязательно)",
@@ -113,7 +113,7 @@ class ToplevelWindow(ctk.CTkToplevel):
         self.progressbar_1 = ctk.CTkProgressBar(self.tabview.tab("Сервер"), corner_radius=3)
         self.progressbar_1.grid(row=3, column=0, columnspan=2, padx=(10, 10), pady=(0, 0), sticky="ew")
         self.progressbar_1.configure(mode="indeterminnate")
-        self.progressbar_1.start()
+        #self.progressbar_1.start()
 
         #окно уведомлений
         self.notification = ctk.CTkLabel(self.tabview.tab("Сервер"),
@@ -132,7 +132,7 @@ class ToplevelWindow(ctk.CTkToplevel):
 
         self.login_button = button.AcessButton(self.button_frame,
                                                 text="Создать",
-                                                command=self.add_profile)
+                                                command=self.add_profile_with_progressbar)
         self.login_button.grid(row=0,
                                column=0,
                                pady=(10, 10),
@@ -175,39 +175,48 @@ class ToplevelWindow(ctk.CTkToplevel):
                            pady=(10, 10),
                            sticky="nsew")
 
+    def add_profile_with_progressbar(self):
+        # Создайте новый фоновый поток для выполнения метода add_profile()
+        thread = threading.Thread(target=self.add_profile)
+        thread.start()
 
     def add_profile(self):
-    """подключаемся к базе данных"""
-        with sqlite3.connect('Charlotte') as conn:
-            cursor = conn.cursor()
-            # получение значений полей ввода
-            name = self.alias_svc.get() or self.ip_adress.get()
-            adress = self.ip_adress.get()
-            port = self.port.get() or 22
-            user = self.user.get()
-            user_pass = self.password.get()
-            #hashed_password = hashlib.sha256(user_pass.encode()).hexdigest() if user_pass else None
-            # валидация IP-адреса и порта
-            if not adress:
-                self.notification.configure(text="Не указан IP-адрес!", text_color=("#FF8C00"))
-                return
-            if int(port) > 65536:
-                self.notification.configure(text="Невалидное значение порта!", text_color=("#FF8C00"))
-                return
-            # вставка данных в таблицу SVC_USERS, SVC_CONNECTS и обновление SERVERS
-            if user and user_pass:
-                # вставка данных в таблицу SERVERS
-                cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
-                server_id = cursor.lastrowid
-                cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server_id, user, user_pass))
-                default_user_id = cursor.lastrowid
-                cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, gefault_user, ip_addr, port) \
-                                VALUES (?, ?, ?, ?)", (server_id, default_user_id, adress, port))
-                cursor.execute("UPDATE SERVERS SET default_connect = ? WHERE svc_id = ?", (cursor.lastrowid, server_id))
-            else:
-                cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, ip_addr, port) VALUES (?, ?, ?)", (server_id, adress, port))
-            # вывод информации о том, что сервер добавлен
-            self.notification.configure(text="Сервер добавлен", text_color=("#FF8C00"))
+        """подключаемся к базе данных"""
+        self.progressbar_1.start()
+        self.conn = sqlite3.connect('Charlotte')
+        self.cursor = self.conn.cursor()
+        # получение значений полей ввода
+        name = self.alias_svc.get() or self.ip_adress.get()
+        adress = self.ip_adress.get()
+        port = self.port.get() or 22
+        user = self.user.get()
+        user_pass = self.password.get()
+        # валидация IP-адреса и порта
+        if not adress:
+            self.notification.configure(text="Не указан IP-адрес!", text_color=("#FF8C00"))
+            return
+        if int(port) > 65536:
+            self.notification.configure(text="Невалидное значение порта!", text_color=("#FF8C00"))
+            return
+        # вставка данных в таблицу SVC_USERS, SVC_CONNECTS и обновление SERVERS
+        if user and user_pass:
+            # вставка данных в таблицу SERVERS
+            self.cursor.execute("INSERT INTO SERVERS (account_id, desc_svc) VALUES (?, ?)", (globaldata.global_id, name))
+            server_id = self.cursor.lastrowid
+            self.cursor.execute("INSERT INTO SVC_USERS (svc_id, svc_login, svc_pass) VALUES (?, ?, ?)", (server_id, user, user_pass))
+            default_user_id = self.cursor.lastrowid
+            self.cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, gefault_user, ip_addr, port) \
+                            VALUES (?, ?, ?, ?)", (server_id, default_user_id, adress, port))
+            self.cursor.execute("UPDATE SERVERS SET default_connect = ? WHERE svc_id = ?", (self.cursor.lastrowid, server_id))
+            self.conn.commit()
+            self.conn.close()#закрываем соединение с базой данных
+            parser = ssh_parser_module.SshParser()
+            parser.add_main_data(svc_id=server_id, adress=adress, port=port, user=user, user_pass=user_pass)
+        else:
+            self.cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, ip_addr, port) VALUES (?, ?, ?)", (server_id, adress, port))
+        # вывод информации о том, что сервер добавлен
+        self.notification.configure(text="Сервер добавлен", text_color=("#FF8C00"))
+        self.progressbar_1.stop()
 
     
     def test_conf(self):
@@ -241,12 +250,11 @@ class ToplevelWindow(ctk.CTkToplevel):
         client.close()
         test_window = ctk.CTkToplevel()
         test_window.title(test_name)
-        #test_window.geometry("400x150")
-        label = ctk.CTkLabel(test_window, text=data)
+        label = ctk.CTkLabel(test_window, text=f"{data} доступен!")
         label.grid(row=0, padx=20, pady=20)
         test_window.after(100, test_window.lift)
         
     
     def cancel(self):
-    """Функция выхода из окна"""
+        """Функция выхода из окна"""
         self.destroy()

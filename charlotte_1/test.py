@@ -4,7 +4,6 @@ import os
 from PIL import Image
 import button 
 import mainMenu
-import menuBar
 import globaldata
 import widgets
 import sqlite3
@@ -83,8 +82,6 @@ class App(ctk.CTk):
             server_data = cursor.fetchall()
             
         for desc_name, srv_id in server_data:
-            #print(desc_name)
-            #print(srv_id)
             self.scrollable_label_button_frame.add_item(desc_name,
                                                         srv_id=srv_id,
                                                         image=ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "conn.png")))
