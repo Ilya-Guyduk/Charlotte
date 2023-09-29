@@ -220,6 +220,7 @@ class ToplevelWindow(ctk.CTkToplevel):
 
     
     def test_conf(self):
+        self.progressbar_1.start()
         test_name = self.alias_svc.get()
         test_adress = self.ip_adress.get()
         test_port = self.port.get()
@@ -248,6 +249,7 @@ class ToplevelWindow(ctk.CTkToplevel):
         data = stdout.read().decode()
         print(data)
         client.close()
+        self.progressbar_1.stop()
         test_window = ctk.CTkToplevel()
         test_window.title(test_name)
         label = ctk.CTkLabel(test_window, text=f"{data} доступен!")

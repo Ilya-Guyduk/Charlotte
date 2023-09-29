@@ -1,6 +1,5 @@
 import customtkinter as ctk
-import widgets
-import serverWindow
+import profileMainWindow
 import button
 
 class ScrollableLabelButtonFrame(ctk.CTkScrollableFrame):
@@ -32,7 +31,7 @@ class ScrollableLabelButtonFrame(ctk.CTkScrollableFrame):
 
     def open_server_window(self, svc_id):
       if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-        self.toplevel_window = serverWindow.ServerWindow(self, svc_id=svc_id) 
+        self.toplevel_window = profileMainWindow.ProfileMainWindow(self, svc_id=svc_id) 
       else:
         self.toplevel_window.focus()
       self.toplevel_window.after(100, self.toplevel_window.lift)
