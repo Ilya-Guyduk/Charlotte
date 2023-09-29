@@ -127,3 +127,5 @@ class LoginTabFrame(ctk.CTkFrame):
         with open('credentials.pkl', 'wb') as file:
             pickle.dump(credentials, file)
 
+
+    

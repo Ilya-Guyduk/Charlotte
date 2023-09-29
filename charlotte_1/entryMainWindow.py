@@ -28,7 +28,7 @@ class EntryloginWindow(ctk.CTk):
                                  size=(130, 130))
         self.logo = ctk.CTkLabel(self,
                                   image=self.logo_reg,
-                                  text=" Charlotte \n 0.01v",
+                                  text=" Charlotte\n0.01v",
                                   font=ctk.CTkFont(family="Courier new",size=23),
                                   compound="left")
         self.logo.grid(row=0,
@@ -49,12 +49,16 @@ class EntryloginWindow(ctk.CTk):
         self.reg_window.tab("Авторизация").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
         self.reg_window.tab("Регистрация").grid_columnconfigure(0, weight=1)
 
-        self.login_frame = LoginTabFrame(master=self.reg_window.tab("Авторизация"),log_entry=self.log_entry, close_window=self.close_window)
+        self.login_frame = LoginTabFrame(master=self.reg_window.tab("Авторизация"),
+                                         log_entry=self.log_entry,
+                                         close_window=self.close_window)
         self.login_frame.grid(row=0,
                                column=0,
                                sticky="nsew")
 
-        self.registration_frame = RegistrationTabFrame(master=self.reg_window.tab("Регистрация"), registration=self.registration, close_window=self.close_window)
+        self.registration_frame = RegistrationTabFrame(master=self.reg_window.tab("Регистрация"),
+                                                       registration=self.registration,
+                                                       close_window=self.close_window)
         self.registration_frame.grid(row=0,
                                column=0,
                                sticky="nsew")
@@ -91,7 +95,7 @@ class EntryloginWindow(ctk.CTk):
         self.conn = sqlite3.connect('Charlotte')
         self.cursor = self.conn.cursor()  
 
-        login = LoginTabFrame.login
+        login = LoginTabFrame.login_entry
         password = login_password_entry.get()      
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         if not login and not password:

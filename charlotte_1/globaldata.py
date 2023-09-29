@@ -1,2 +1,2 @@
 
-global_id = 0
+global_id = 8

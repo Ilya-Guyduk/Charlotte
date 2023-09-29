@@ -31,6 +31,21 @@ class LittleAcessButton(ctk.CTkButton):
             font=ctk.CTkFont(family="Courier new")
         )
 
+class LittleDeleteButton(ctk.CTkButton):
+    def __init__(self, button_frame, text, command):
+        super().__init__(
+            button_frame,
+            text=text,
+            command=command,
+            width=30,
+            fg_color="transparent",
+            border_width=1,
+            text_color=("gray10", "#DCE4EE"),
+            corner_radius=4,
+            hover_color=("#FF0000"),
+            border_color=("#5A5757"),
+            font=ctk.CTkFont(family="Courier new")
+        )
 
 class CancelButton(ctk.CTkButton):
     def __init__(self, button_frame, text, command):
