@@ -38,51 +38,61 @@ class ConnectTabFrame(ctk.CTkFrame):
 
         save_ip = button.LittleAcessButton(self,
                                              text="✔️",
-                                             command=self.add_entry)
+                                             command=self.save_entries)
         save_ip.grid(row=0,
                          column=4,
                          padx=(0, 10),
                          pady=(10, 0),
                          sticky="new")
 
+        #окно уведомлений
+        self.notification = ctk.CTkLabel(self,
+                                                    text="",
+                                                    font=ctk.CTkFont(family="Courier new")
+                                                    )
+        self.notification.grid(row=1, 
+                               column=0,
+                               sticky="nsew",
+                               columnspan=2)
+
     def add_entry(self):
-        # Создание новых полей IP-адреса и порта
-        new_ip_address = ctk.CTkEntry(self.connect_frame,
-                                      placeholder_text="IP-адрес",
-                                      corner_radius=3)
-        new_port = ctk.CTkEntry(self.connect_frame,
-                                placeholder_text="Порт(22 по умолчанию)",
-                                width=90,
-                                corner_radius=3)
+        # Получение данных из базы данных и автоматическое заполнение полей
+        if self.svc_id is not None:
+            conn = sqlite3.connect('Charlotte')  # Замените на имя вашей базы данных SQLite
+            cursor = conn.cursor()
+            cursor.execute("SELECT ip_addr, port FROM SVC_CONNECTS WHERE svc_id=?", (self.svc_id,))
+            results = cursor.fetchall()
+            
+            conn.close()
+        else:
+            results = []  # Если svc_id не указан, задаем пустой результат
 
-        delete = button.LittleDeleteButton(self.connect_frame,
-                                           text="❌",
-                                           command=lambda: self.delete_entry(new_ip_address, new_port, delete))
+        for result in results:
+            ip_addr, port = result
 
-        
+            # Создание новых полей IP-адреса и порта
+            new_ip_address = ctk.CTkEntry(self.connect_frame, placeholder_text="IP-адрес", corner_radius=3)
+            new_ip_address.insert(0, ip_addr)  # Вписываем значение ip_addr
 
-        # Размещение новых полей в сетке
-        new_ip_address.grid(row=self.current_row + 1,
-                            column=0,
-                            padx=(5, 5),
-                            pady=(5, 5),
-                            sticky="nsew")
-        new_port.grid(row=self.current_row + 1,
-                      column=1,
-                      padx=(0, 5),
-                      pady=(5, 5),
-                      sticky="nsew")
-        delete.grid(row=self.current_row + 1,
-                    column=2,
-                    padx=(0, 5),
-                    pady=(5, 5),
-                    sticky="nsew")
+            new_port = ctk.CTkEntry(self.connect_frame, placeholder_text="Порт(22 по умолчанию)", width=90, corner_radius=3)
+            new_port.insert(0, port)  # Вписываем значение port
 
-        # Добавление созданных полей в список
-        self.entries.append((new_ip_address, new_port, delete))
+            delete = button.LittleDeleteButton(self.connect_frame, text="❌",
+                                               command=lambda: self.delete_entry(new_ip_address, new_port, delete))
 
-        # Увеличение счетчика строк
-        self.current_row += 1
+            # Размещение новых полей в сетке
+            new_ip_address.grid(row=self.current_row + 1, column=0, padx=(5, 5), pady=(5, 5), sticky="nsew")
+            new_port.grid(row=self.current_row + 1, column=1, padx=(0, 5), pady=(5, 5), sticky="nsew")
+            delete.grid(row=self.current_row + 1, column=2, padx=(0, 5), pady=(5, 5), sticky="nsew")
+
+            # Добавление созданных полей в список
+            self.entries.append((new_ip_address, new_port, delete))
+
+            # Увеличение счетчика строк
+            self.current_row += 1
+
+
+
 
     def delete_entry(self, ip_address, port, delete_button):
         # Удаление полей и кнопки из сетки
@@ -95,3 +105,23 @@ class ConnectTabFrame(ctk.CTkFrame):
 
         # Обновление окна
         self.update()
+
+
+    def save_entries(self):
+        # Сохранение записей в базу данных
+        self.conn = sqlite3.connect('Charlotte')
+        self.cursor = self.conn.cursor()
+
+        # Удаление предыдущих записей с svc_id
+        #cursor.execute("DELETE FROM SVC_CONNECTS WHERE svc_id=?", (self.svc_id,))
+
+        # Вставка новых записей
+        for entry in self.entries:
+            ip_address = entry[0].get()
+            port = entry[1].get()
+            self.cursor.execute("INSERT INTO SVC_CONNECTS (svc_id, ip_addr, port) VALUES (?, ?, ?)",
+                           (self.svc_id, ip_address, port))
+
+        self.conn.commit()
+        self.conn.close()
+        self.notification.configure(text="Адреса добавлены!", text_color=("#FF8C00"))
