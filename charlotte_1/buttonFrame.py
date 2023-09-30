@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import button
-import addprofile
+from addprofileMainWindow import AddProfileMainWindow
 from CTkToolTip import *
 
 class ButtonFrame(ctk.CTkFrame):
@@ -44,7 +44,7 @@ class ButtonFrame(ctk.CTkFrame):
 
 	def open_input_dialog_event(self):
 		if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-			self.toplevel_window = addprofile.ToplevelWindow(self)  # create window if its None or destroyed
+			self.toplevel_window = AddProfileMainWindow(self)  # create window if its None or destroyed
 		else:
 			self.toplevel_window.focus()  # if window exists focus it
 		self.toplevel_window.after(100, self.toplevel_window.lift)

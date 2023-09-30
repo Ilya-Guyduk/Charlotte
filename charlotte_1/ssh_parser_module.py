@@ -19,37 +19,60 @@ class SshParser():
                         password=self.user_pass,
                         port=self.port
                         )
-        print("передача команды")
+        print("передача команды hostnamectl")
         stdin, stdout, stderr = client.exec_command('hostnamectl')
-        output = stdout.read().decode()
+        output_hostname = stdout.read().decode()
 
-        # Распарсиваем вывод команды
-        parsed_data = {}
-        for line in output.split('\n'):
+        print("передача команды lscpu")
+        stdin, stdout, stderr = client.exec_command('lscpu')
+        output_lscpu = stdout.read().decode()
+
+        # Распарсиваем вывод команды hostnamectl
+        parsed_data_hostname = {}
+        for line in output_hostname.split('\n'):
             if ': ' in line:
                 key, value = line.split(': ')
                 print("Ключи:", key, "значения:", value)
-                parsed_data[key.rstrip()] = value.lstrip()
+                parsed_data_hostname[key.rstrip()] = value.lstrip()
                     
-        print(parsed_data)
+        print(parsed_data_hostname)
+
+        # Распарсиваем вывод команды lscpu
+        parsed_data_lscpu = {}
+        for line in output_lscpu.split('\n'):
+            if ':' in line:
+                key, value = line.split(':', 1)
+                print("Ключи:", key, "значения:", value)
+                parsed_data_lscpu[key.strip()] = value.strip()
+                    
+        print(parsed_data_lscpu)
 
         # Вставляем данные в таблицу
         self.conn = sqlite3.connect('Charlotte')
         self.cursor = self.conn.cursor()
         self.cursor.execute('''
-            INSERT INTO svc_main (svc_id, hostname, chassis, machine_id, boot_id, os, kernel, architecture)
+            INSERT INTO SVC_MAIN (svc_id, hostname, chassis, machine_id, boot_id, os, kernel, architecture)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''',(self.svc_id,
-            parsed_data.get('   Static hostname', ''),
-            parsed_data.get('           Chassis', ''),
-            parsed_data.get('        Machine ID', ''),
-            parsed_data.get('           Boot ID', ''),
-            parsed_data.get('  Operating System', ''),
-            parsed_data.get('            Kernel', ''),
-            parsed_data.get('      Architecture', '')))
+            parsed_data_hostname.get('   Static hostname', ''),
+            parsed_data_hostname.get('           Chassis', ''),
+            parsed_data_hostname.get('        Machine ID', ''),
+            parsed_data_hostname.get('           Boot ID', ''),
+            parsed_data_hostname.get('  Operating System', ''),
+            parsed_data_hostname.get('            Kernel', ''),
+            parsed_data_hostname.get('      Architecture', '')))
+        self.cursor.execute('''
+            INSERT INTO SVC_CPU (svc_id, model_name, cpus, cores_per_socket, sockets, cpu_mhz)
+            VALUES(?, ?, ?, ?, ?, ?)
+        ''',(self.svc_id,
+            parsed_data_lscpu.get('Model name', ''),
+            parsed_data_lscpu.get('CPU(s)', ''),
+            parsed_data_lscpu.get('Core(s) per socket', ''),
+            parsed_data_lscpu.get('Socket(s)', ''),
+            parsed_data_lscpu.get('CPU MHz', ''),
+                                 ))
         self.conn.commit()
-        self.conn.close()#закрываем соединение с базой данных
-
+        self.conn.close()  # Закрываем соединение с базой данных
 
     def add_addr(self, svc_id=None, adress=None, port=None, user=None, user_pass=None):
         self.svc_id = svc_id

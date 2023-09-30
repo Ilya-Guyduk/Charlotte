@@ -1,15 +1,15 @@
 import customtkinter as ctk
-import scrollableLabelButtonFrame as sc
+from appScrollableLabelButtonFrame import ScrollableLabelButtonFrame as sc
 import os
 from PIL import Image
 import button 
-import mainMenu
+from appMenuBar import OptionMenuHolder
 import globaldata
 import widgets
 import sqlite3
 from tabs import CTkTabview as tab
 from buttonFrame import ButtonFrame
-
+from appEventTab import EventTabFrame
 
 class App(ctk.CTk):
     def __init__(self):
@@ -18,22 +18,19 @@ class App(ctk.CTk):
         self.title("Charlotte v0.01")
         self.geometry(f"{1100}x{580}")
         # configure grid layout (4x4)
-        self.grid_columnconfigure(1,
-                                  weight=1)
-        self.grid_columnconfigure((2, 3),
-                                  weight=0)
-        self.grid_rowconfigure((1, 2),
-                               weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure((2, 3), weight=0)
+        self.grid_rowconfigure((1, 2), weight=1)
 
         #верхнее меню
-        self.optionmenu = mainMenu.OptionMenuHolder(self)
-        self.optionmenu.grid(row=0,
+        self.option_menu = OptionMenuHolder(self)
+        self.option_menu.grid(row=0,
                             column=0,
                             columnspan=4,
                             sticky="nsew")
-        self.optionmenu.grid_columnconfigure(0,
-                                             weight=0)
+        self.option_menu.grid_columnconfigure(0, weight=0)
         #====================================================
+
         #фрейм сайдбара с виджетами
         self.sidebar_frame = ctk.CTkFrame(self,
                                           corner_radius=0
@@ -42,9 +39,9 @@ class App(ctk.CTk):
                                 column=0,
                                 rowspan=5,
                                 sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(4,
-                                             weight=1)
+        self.sidebar_frame.grid_rowconfigure(4, weight=1)
         #=====================================================
+
         #лого на главном экране
         current_dir = os.path.dirname(os.path.abspath(__file__))
         logo_main = ctk.CTkImage(Image.open(os.path.join(current_dir, "img", "logo2.png")),
@@ -70,11 +67,16 @@ class App(ctk.CTk):
                                padx=1,
                                sticky="nsew")
         #=====================================================================================
-        self.scrollable_label_button_frame = sc.ScrollableLabelButtonFrame(self.sidebar_frame, 
-                                                                   corner_radius=0, 
-                                                                   scrollbar_button_hover_color=("#5A5757"),
-                                                                   border_width=1)
-        self.scrollable_label_button_frame.grid(row=4, column=0, pady=0, padx=(0, 0), columnspan=2, sticky="nsew")
+        self.scrollable_label_button_frame = sc(self.sidebar_frame, 
+                                                corner_radius=0, 
+                                                scrollbar_button_hover_color=("#5A5757"),
+                                                border_width=1)
+        self.scrollable_label_button_frame.grid(row=4, 
+                                                column=0, 
+                                                pady=0, 
+                                                padx=(0, 0), 
+                                                columnspan=2, 
+                                                sticky="nsew")
         
         with sqlite3.connect('Charlotte') as conn:
             cursor = conn.cursor()
@@ -154,139 +156,17 @@ class App(ctk.CTk):
                           pady=(0, 0),
                           sticky="nsew")
         self.tabview.add("Общие показатели")
-        self.tabview.add("Tab 2")
-        self.tabview.add("Tab 3")
         self.tabview.tab("Общие показатели").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
-        self.tabview.tab("Общие показатели").grid_rowconfigure((0, 1),weight=1)
+        self.tabview.tab("Общие показатели").grid_rowconfigure(0,weight=1)
+        self.tabview.add("Tab 2")
         self.tabview.tab("Tab 2").grid_columnconfigure(0, weight=1)
         #=========================================================================================
-        # create textbox
-        self.metrix_frame = ctk.CTkFrame(self.tabview.tab("Общие показатели"))
-        self.metrix_frame.grid(row=0,
-                               column=0,
-                               rowspan=3,
-                               padx=(5, 0),
-                               pady=(0, 5),
-                               sticky="nsew")
 
-        self.textbox = ctk.CTkTextbox(self.tabview.tab("Общие показатели"),
-                                                width=250,
-                                                corner_radius=3)
-        self.textbox.insert("0.0",
-                            "Оповещения:\n\n" + "Подозрительные изменения в акнутом алерте Сервер: uz-ceir-geo-app2 Алерт: face-id-proxy-service_proc PROCS CRITICAL: 0 processes with args '/opt/svyazcom/bin/face-id-proxy-service' check_stat_ussd_out WARNING! Count of USSD_OUT_FULL_ALL is low or high (8 instead 30) in last 1 hours!\n\n" * 20)
-        self.textbox.grid(row=0,
-                          column=1,
-                          padx=(5, 0),
-                          pady=(0, 0),
-                          sticky="nsew")
-
-        # create radiobutton frame
-        self.radiobutton_frame = ctk.CTkFrame(self.tabview.tab("Общие показатели"))
-        self.radiobutton_frame.grid(row=0,
-                                    column=2,
-                                    padx=(5, 5),
-                                    pady=(0, 0),
-                                    sticky="nsew")
-
-        self.radio_var = ctk.IntVar(value=0)
-        self.label_radio_group = ctk.CTkLabel(master=self.radiobutton_frame,
-                                                        text="CTkRadioButton Group:")
-        self.label_radio_group.grid(row=0,
-                                    column=2, 
-                                    columnspan=1,
-                                    padx=10,
-                                    pady=10,
-                                    sticky="")
-        self.radio_button_1 = ctk.CTkRadioButton(master=self.radiobutton_frame,
-                                                           variable=self.radio_var,
-                                                           value=0,
-                                                           corner_radius=3)
-        self.radio_button_1.grid(row=1,
-                                 column=2,
-                                 pady=10,
-                                 padx=20,
-                                 sticky="n")
-        self.radio_button_2 = ctk.CTkRadioButton(master=self.radiobutton_frame,
-                                                           variable=self.radio_var,
-                                                           value=1,
-                                                           corner_radius=3)
-        self.radio_button_2.grid(row=2,
-                                 column=2,
-                                 pady=10,
-                                 padx=20,
-                                 sticky="n")
-        self.radio_button_3 = ctk.CTkRadioButton(master=self.radiobutton_frame,
-                                                           variable=self.radio_var,
-                                                           value=2,
-                                                           corner_radius=3)
-        self.radio_button_3.grid(row=3,
-                                 column=2,
-                                 pady=10,
-                                 padx=20,
-                                 sticky="n")
-
-        # create scrollable frame
-        self.scrollable_frame = ctk.CTkScrollableFrame(self.tabview.tab("Общие показатели"),
-                                                                 label_text="Метрики",
-                                                                 corner_radius=3)
-        self.scrollable_frame.grid(row=1,
-                                   column=1,
-                                   rowspan=2,
-                                   padx=(5, 0),
-                                   pady=(5, 5),
-                                   sticky="nsew")
-        self.scrollable_frame.grid_columnconfigure(0,
-                                                   weight=1)
-        self.scrollable_frame_switches = []
-        for i in range(100):
-            switch = ctk.CTkSwitch(self.scrollable_frame,
-                                             text=f"CTkSwitch {i}",
-                                             corner_radius=3)
-            switch.grid(row=i,
-                        column=0,
-                        padx=10,
-                        pady=(0, 10))
-            self.scrollable_frame_switches.append(switch)
-        #===================================================================================
+        self.event_frame = EventTabFrame(master=self.tabview.tab("Общие показатели"))
+        self.event_frame.grid(sticky="nsew")
 
 
-        # create checkbox and switch frame
-        self.checkbox_slider_frame = ctk.CTkFrame(self.tabview.tab("Общие показатели"))
-        self.checkbox_slider_frame.grid(row=1,
-                                        column=2,
-                                        rowspan=2,
-                                        padx=(5, 5),
-                                        pady=(5, 5),
-                                        sticky="nsew")
-        self.checkbox_1 = ctk.CTkCheckBox(self.checkbox_slider_frame,
-                                                    corner_radius=3)
-        self.checkbox_1.grid(row=1,
-                             column=0,
-                             pady=(20, 0),
-                             padx=20,
-                             sticky="n")
-        self.checkbox_2 = ctk.CTkCheckBox(self.checkbox_slider_frame,
-                                                    corner_radius=3)
-        self.checkbox_2.grid(row=2,
-                             column=0,
-                             pady=(20, 0),
-                             padx=20,
-                             sticky="n")
-        self.checkbox_3 = ctk.CTkCheckBox(self.checkbox_slider_frame,
-                                                    corner_radius=3)
-        self.checkbox_3.grid(row=3,
-                             column=0,
-                             pady=20,
-                             padx=20,
-                             sticky="n")
-        #====================================================================
-
-        # set default values
-        self.checkbox_3.configure(state="disabled")
-        self.checkbox_1.select()
-        self.scrollable_frame_switches[0].select()
-        self.scrollable_frame_switches[4].select()
-        self.radio_button_3.configure(state="disabled")
+        #======================================================================
         self.toplevel_window = None
         #======================================================================
         #======================================================================

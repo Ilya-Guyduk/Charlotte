@@ -1,9 +1,10 @@
 from tabs import CTkTabview as tab #модуль с окном регистрации
-import customtkinter as ctk
 from PIL import Image
-import os
 from entryRegistrationTab import RegistrationTabFrame
 from entryLoginTab import LoginTabFrame
+from appMainWindow import App
+import customtkinter as ctk
+import os
 import sqlite3
 
 #дефолтные настройки системы
@@ -110,7 +111,7 @@ class EntryloginWindow(ctk.CTk):
             self.conn.close()#закрываем соединение с базой данных
             print(globaldata.global_id)
             self.destroy()  # Закройте окно входа
-            app = test.App()  # Создайте экземпляр класса основного окна
+            app = App()  # Создайте экземпляр класса основного окна
             app.mainloop()  # Запустите основное окно приложения
         else:
             self.login_notification.configure(text="Не верный логин или пароль!",

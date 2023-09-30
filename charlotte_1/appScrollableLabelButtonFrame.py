@@ -26,6 +26,7 @@ class ScrollableLabelButtonFrame(ctk.CTkScrollableFrame):
                    pady=(0, 0),
                    padx=2, 
                    sticky="nsew")
+        self.label.bind('<Button-3>', lambda srv_id=srv_id: self.open_server_window(srv_id))
         self.label_list.append(self.label)
         self.toplevel_window = None
 

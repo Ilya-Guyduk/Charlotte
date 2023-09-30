@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import button
-import addprofile
 from CTkToolTip import *
 import sqlite3
 import globaldata
